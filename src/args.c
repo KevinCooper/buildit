@@ -7,22 +7,19 @@
 #include "dbg.h"
 #include "args.h"
 
-//int main( int argc, char **argv[])
-logappend_args opt_parser(int32_t argc, char **argv, error_t*  status)
+logappend_args opt_parser(int32_t argc, char **argv)
 {
-	//error_t*  status;
-	int i = 0;
-	for (i =0; i< argc; i++){
-		debug("%s",argv[i]);
-	}
 	int32_t index;
 	int32_t c;
 	logappend_args args;
-	args.token = NULL; args.employeeName = NULL; args.guestName = NULL; args.logName = NULL; args.batchFile = NULL; args.eventArrival =0; args.eventDeparture=0;args.roomID=0;
+	args.token = NULL; args.employeeName = NULL; args.guestName = NULL; args.logName = NULL; args.batchFile = NULL; args.eventArrival =-1; args.eventDeparture=-1;args.roomID=-1;
+	args.timestamp = 0;
 	opterr = 0;
-	uint32_t len = 0;
+	int32_t len = 0;
+
 //TODO: Check for invalid inputs (Token Flag with no opt, will give ":" )
-  while ((c = getopt (argc, argv, ":T:B:K:E:G:ALR:")) != -1)
+  while ((c = getopt (argc, argv, "T:B:K:E:G:ALR:")) != -1){
+	  debug("%d",c);
     switch (c)
       {
       case 'T':
@@ -46,7 +43,7 @@ logappend_args opt_parser(int32_t argc, char **argv, error_t*  status)
     	if (args.guestName != NULL ){
     		goto INVALID;
     	}
-    	uint32_t len = strlen(optarg);
+    	int32_t len = strlen(optarg);
         args.employeeName = (char *) malloc(len + 1);
         args.employeeName = strdup(optarg);
         *(args.employeeName + len)='\0';
@@ -87,6 +84,7 @@ logappend_args opt_parser(int32_t argc, char **argv, error_t*  status)
       default:
         abort ();
       }
+  }
   index = optind;
   if(index < argc){
 	  args.logName = argv[index];
@@ -94,11 +92,11 @@ logappend_args opt_parser(int32_t argc, char **argv, error_t*  status)
   debug("\nTimestamp: %d\nToken: %s\nEmployee: %s\nGuest: %s\nArrival: %d\nDeparture: %d\nRoomID: %d\nLogName: %s\nBatchName: %s",
 		  args.timestamp, args.token, args.employeeName, args.guestName, args.eventArrival, args.eventDeparture,
 		  args.roomID, args.logName, args.batchFile);
-  status = 0;
+  args.returnStatus =0;
   return args;
 
   INVALID: ;
   debug("\nINVALID");
-  status = 0;
+  args.returnStatus =-1;
   return args;
 }

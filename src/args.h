@@ -3,11 +3,8 @@
 
 
 #include "definitions.h"
-#include "args.c"
 #include <stdint.h>
 
-//int opt_parser(int32_t argc, char **argv, error_t*  status);
-
-logappend_args opt_parser(int32_t argc, char **argv, error_t*  status);
+logappend_args opt_parser(int32_t argc, char **argv);
 
 #endif /* ARGS_H_ */
