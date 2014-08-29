@@ -17,7 +17,7 @@ typedef struct
 	 *   Positive number of seconds since gallery opened.  Time should always increase.
 	 *   Invoking logappend with event prior to time of most recent log is an error
 	 */
-	uint32_t timestamp;
+	int32_t timestamp;
 	/*
 	 *	Token used to authenticate log.  Consists of arbitrary-sized string of alphanumeric (a-aA-Z0-9) characters.
 	 *	Once a log is created, subsequent logs must use same token.
@@ -32,16 +32,16 @@ typedef struct
 	 * Can be used with the name options as well as the room ID options.  In no room ID is defined, assume -A
 	 * means that they arrived at the gallery as a whole. Should never enter a room without having left the last room they entered.
 	 */
-	uint32_t eventArrival;
+	int32_t eventArrival;
 	/*
 	 * Can be used with the name options as well as the room ID options.  In no room ID is defined, assume -L
 	 * means that they left the building. Cannot leave the gallery without last leaving the room they entered.
 	 */
-	uint32_t eventDeparture;
+	int32_t eventDeparture;
 	/*
 	 * None-negative integer characters with no spaces.  A
 	 */
-	uint32_t roomID;
+	int32_t roomID;
 	/*
 	 * Path to file containing log
 	 */
@@ -50,6 +50,8 @@ typedef struct
 	 * Path to file containing list of commands to run
 	 */
 	char * batchFile;
+
+	int returnStatus;
 
 }logappend_args;
 
