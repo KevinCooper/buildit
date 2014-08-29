@@ -1,0 +1,66 @@
+/*
+ * definitions.h
+ *
+ *  Created on: Aug 29, 2014
+ *      Author: kevin
+ */
+
+#ifndef DEFINITIONS_H_
+#define DEFINITIONS_H_
+#include <unistd.h>
+#include <stdint.h>
+
+
+typedef struct
+{
+	/*
+	 *   Positive number of seconds since gallery opened.  Time should always increase.
+	 *   Invoking logappend with event prior to time of most recent log is an error
+	 */
+	uint32_t timestamp;
+	/*
+	 *	Token used to authenticate log.  Consists of arbitrary-sized string of alphanumeric (a-aA-Z0-9) characters.
+	 *	Once a log is created, subsequent logs must use same token.
+	 */
+	char * token;
+	/*
+	 * Upper and lower case letters only.  No spaces.  This applies to both guestName and employeeName which are mutually exclusive.
+	 */
+	char * employeeName;
+	char * guestName;
+	/*
+	 * Can be used with the name options as well as the room ID options.  In no room ID is defined, assume -A
+	 * means that they arrived at the gallery as a whole. Should never enter a room without having left the last room they entered.
+	 */
+	uint32_t eventArrival;
+	/*
+	 * Can be used with the name options as well as the room ID options.  In no room ID is defined, assume -L
+	 * means that they left the building. Cannot leave the gallery without last leaving the room they entered.
+	 */
+	uint32_t eventDeparture;
+	/*
+	 * None-negative integer characters with no spaces.  A
+	 */
+	uint32_t roomID;
+	/*
+	 * Path to file containing log
+	 */
+	char * logName;
+	/*
+	 * Path to file containing list of commands to run
+	 */
+	char * batchFile;
+
+}logappend_args;
+
+typedef enum
+{
+	FUNC_OK,
+	INVALID_INPUT,
+	INVALID_SIGNATURE,
+	INVALID_MOVEMENT
+} error_t;
+
+
+
+#endif /* DEFINITIONS_H_ */
