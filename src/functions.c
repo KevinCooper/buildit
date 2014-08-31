@@ -35,11 +35,11 @@ int check_logic(logappend_args * args) {
 		if (args->roomID == -1 && !temp->inBuilding) {
 			temp->inBuilding = 1;
 		} else if (args->roomID == -1 && temp->inBuilding) {
-			return -1;
+			invalid();
 		} else if (args->roomID != -1 && !temp->inBuilding) {
-			return -1;
+			invalid();
 		} else if (args->roomID != -1 && temp->inRoom) {
-			return -1;
+			invalid();
 		} else if (args->roomID != -1 && !temp->inRoom) {
 			temp->inRoom = 1;
 			temp->roomID = args->roomID;
@@ -49,14 +49,14 @@ int check_logic(logappend_args * args) {
 		if (args->roomID == -1 && temp->inBuilding) {
 			temp->inBuilding = 0;
 		} else if (args->roomID == -1 && !temp->inBuilding) {
-			return -1;
+			invalid();
 		} else if (args->roomID != -1 && !temp->inBuilding) {
-			return -1;
+			invalid();
 		} else if (args->roomID != -1 && !temp->inRoom) {
-			return -1;
+			invalid();
 		} else if (args->roomID != -1 && temp->inRoom) {
 			if (args->roomID != temp->roomID) {
-				return -1;
+				invalid();
 			}
 			temp->inRoom = 0;
 			temp->roomID = 0;
