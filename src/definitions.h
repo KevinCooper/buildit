@@ -7,8 +7,10 @@
 
 #ifndef DEFINITIONS_H_
 #define DEFINITIONS_H_
+
 #include <unistd.h>
 #include <stdint.h>
+#include "uthash.h"
 
 
 typedef struct
@@ -58,6 +60,13 @@ typedef struct
 	char * toString;
 
 }logappend_args;
+
+struct logicUser{
+	char name[256];
+	uint32_t roomID;
+	uint32_t inRoom;
+	UT_hash_handle hh;
+};
 
 typedef enum
 {
