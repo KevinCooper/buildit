@@ -53,6 +53,10 @@ typedef struct
 
 	int returnStatus;
 
+
+	//String representation
+	char * toString;
+
 }logappend_args;
 
 typedef enum

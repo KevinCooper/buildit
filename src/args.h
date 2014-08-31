@@ -6,5 +6,6 @@
 #include <stdint.h>
 
 logappend_args opt_parser(int32_t argc, char **argv);
+void * toString(logappend_args* args);
 
 #endif /* ARGS_H_ */

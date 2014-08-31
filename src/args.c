@@ -25,6 +25,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 	args.eventDeparture = -1;
 	args.roomID = -1;
 	args.timestamp = -1;
+	args.toString = NULL;
 	opterr = 0;
 	int32_t len = 0;
 	optind = 0;  //This must occur to have getopt back in its correct state!
@@ -32,7 +33,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 //TODO: Check for invalid inputs (Token Flag with no opt, will give ":" )
 
 	while ((c = getopt(argc, argv, "T:B:K:E:G:ALR:")) != -1) {
-		debug("%d", c);
+//		debug("%d", c);
 		switch (c) {
 		case 'T':
 			args.timestamp = atoi(optarg);
@@ -112,10 +113,46 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 	} else {
 		args.returnStatus = 0;
 	}
-
+	if (args.returnStatus != -1)
+		toString(&args);
 	return args;
 
 	BAD: ;
 	args.returnStatus = -1;
 	return args;
+}
+
+void * toString(logappend_args* args) {
+	char * string = (char *) calloc(256, 1);
+	char str[15];
+	if (args->batchFile != NULL) {
+		sprintf(string, "-B %s ", args->batchFile);
+	} else {
+		sprintf(string, "-T %d ", args->timestamp);
+		if (args->eventArrival == -1) {
+			strcat(string, "-L ");
+		} else {
+			strcat(string, "-A ");
+		}
+		if (args->employeeName == NULL) {
+			strcat(string, "-E ");
+			strcat(string, args->guestName);
+		} else {
+			strcat(string, "-G ");
+			strcat(string, args->employeeName);
+		}
+		if (args->roomID != -1) {
+			strcat(string, " -R ");
+			sprintf(str, "%d", args->roomID);
+			strcat(string, str);
+			strcat(string, " ");
+			strcat(string, args->logName);
+		} else {
+			strcat(string, " ");
+			strcat(string, args->logName);
+		}
+	}
+	strcat(string, "\n");
+	args->toString = string;
+	return 0;
 }
