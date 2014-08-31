@@ -55,14 +55,12 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 			//TODO: verify that name is upper/lowercase letters.  No spaces.
 			len = strlen(optarg);
 			args.employeeName = (char *) malloc(len + 1);
-			args.employeeName = strdup(optarg);
-			*(args.employeeName + len) = '\0';
+			strcpy(args.employeeName, optarg);
 			break;
 		case 'G':
 			len = strlen(optarg);
 			args.guestName = (char *) malloc(len + 1);
-			args.guestName = strdup(optarg);
-			*(args.guestName + len) = '\0';
+			strcpy(args.guestName, optarg);
 			break;
 		case 'A':
 			args.eventArrival = 1;
