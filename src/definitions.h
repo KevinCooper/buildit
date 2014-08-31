@@ -10,7 +10,6 @@
 
 #include <unistd.h>
 #include <stdint.h>
-#include "uthash.h"
 
 
 typedef struct
@@ -61,12 +60,12 @@ typedef struct
 
 }logappend_args;
 
-struct logicUser{
-	char name[256];
+typedef struct{
 	uint32_t roomID;
 	uint32_t inRoom;
-	UT_hash_handle hh;
-};
+	uint32_t inBuilding;
+	char name[256];
+}logicUser;
 
 typedef enum
 {
