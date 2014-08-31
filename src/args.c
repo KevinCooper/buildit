@@ -122,6 +122,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 	return args;
 }
 
+//FIXME: Maybe strings larger than 256?
 void * toString(logappend_args* args) {
 	char * string = (char *) calloc(256, 1);
 	char str[15];

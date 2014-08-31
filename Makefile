@@ -1,5 +1,5 @@
-CC=gcc
-CFLAGS=-g -m32 -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
+CC=clang
+CFLAGS=-g -O2 -Wall -Wextra -lcrypto -lssl -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
 LIBS=-ldl $(OPTLIBS)
 PREFIX?=/usr/local
 
