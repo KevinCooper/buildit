@@ -11,15 +11,9 @@
 #include <openssl/aes.h>
 #include "hash.h"
 #include "argv.h"
+#include "functions.h"
 
-//2^16
-HT* allMahHashes;
-
-off_t fsize(const char *filename);
-int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *e_ctx, EVP_CIPHER_CTX *d_ctx);
-unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len);
-unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len);
-int check_logic(logappend_args * args);
+void printMD5(char * toPrint);
 
 int main(int argc, char * argv[]) {
 	allMahHashes = ht_create(65536);
@@ -50,10 +44,8 @@ int main(int argc, char * argv[]) {
 	char * encryptedFileWithInputMD5 = calloc(MD5_DIGEST_LENGTH + 1, 0);
 	char * decryptedFileMD5 = calloc(MD5_DIGEST_LENGTH + 1, 0);
 
-	if (args.returnStatus == -1) {
-		printf("invalid\n");
-		return -1;
-	}
+	if (args.returnStatus == -1)
+		invalid();
 
 	if (args.batchFile) {
 		//TODO: Batch interpreter call.  Not implemented yet.
@@ -68,23 +60,24 @@ int main(int argc, char * argv[]) {
 	//Open up the file or create it if it doesn't exist
 	fileSize = fsize(args.logName);
 	if (fileSize < 16) {
-		debug("%s", "File is too short to have an MD5, must be a new file");
 		newFile = 1;
 		mahFile = fopen(args.logName, "w+");
 	} else {
 		mahFile = fopen(args.logName, "r+");
 	}
 	if (mahFile == NULL)
-		return -1;
+		invalid();
 
 	//Compute the MD5 of the file
 	MD5_Init(&mdContext);
 	MD5_Init(&mdContextWithUserInput);
 	if (!newFile) {
 		while ((read = getline(&line, &bytes, mahFile)) != -1 && fileSize > 16) {
+
 			int len = strlen(line);
 			fileSize = fileSize - len;
-			// RERUN COMMANDS CAUZE
+
+			// RERUN COMMANDS CAUZE LOGIC!
 			sprintf(interString, "./logappend %s", line);
 			int tempc;
 			char ** tempv = argv_split(interString, &tempc);
@@ -93,7 +86,8 @@ int main(int argc, char * argv[]) {
 			argv_free(tempv);
 			if (check_logic(&temp) == -1)
 				return -1;
-			//
+			// FINISH LOGICZ
+
 			MD5_Update(&mdContext, line, len);
 			MD5_Update(&mdContextWithUserInput, line, len);
 		}
@@ -103,29 +97,26 @@ int main(int argc, char * argv[]) {
 	MD5_Update(&mdContextWithUserInput, args.toString, strlen(args.toString));
 	MD5_Final(currentFileMD5, &mdContext);
 	MD5_Final(fileWithInputMD5, &mdContextWithUserInput);
+
 	//Mah debug printf's
-	printf("%s", "MD5 of the current file:");
-	for (i = 0; i < MD5_DIGEST_LENGTH; i++)
-		printf("%02x", currentFileMD5[i]);
-	printf("%s", "\n");
-	printf("%s", "MD5 of the current file with input:");
-	for (i = 0; i < MD5_DIGEST_LENGTH; i++)
-		printf("%02x", fileWithInputMD5[i]);
-	printf("%s", "\n");
-	fflush(stdout);
+	printf("%s", "MD5 of the current file:    ");
+	printMD5(currentFileMD5);
+	printf("%s", "MD5 of the updated file:    ");
+	printMD5(fileWithInputMD5);
+
 	//Check the old md5
 	int status;
 	if (!newFile) {
+		//Encrypted MD5 should be last 16 bytes of the file
 		status = fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
 		status = fread(encryptedFileMD5, sizeof(unsigned char), MD5_DIGEST_LENGTH, mahFile);
-		encryptedFileMD5[MD5_DIGEST_LENGTH] = '\0';
-		printf("The encrypted md5 was: %s\n", encryptedFileMD5);
+		printf("The encrypted MD5 was:      ");
+		printMD5(encryptedFileMD5);
 		decryptedFileMD5 = (char *) aes_decrypt(&de, encryptedFileMD5, len);
 		decryptedFileMD5[MD5_DIGEST_LENGTH] = '\0';
-		printf("%s", "Decrypted MD5 of the current file:");
-		for (i = 0; i < MD5_DIGEST_LENGTH; i++)
-			printf("%02x", decryptedFileMD5[i]);
-		printf("%s", "\n");
+		printf("%s", "Decrypted current file MD5: ");
+		printMD5(decryptedFileMD5);
+
 		/* DISABLE CRYPTO CHECK UNTIL WORKING
 		 for (i = 0; i < MD5_DIGEST_LENGTH; i++) {
 		 if ((unsigned char)decryptedFileMD5[i] != (unsigned char)currentFileMD5[i]) {
@@ -134,6 +125,7 @@ int main(int argc, char * argv[]) {
 		 }
 		 }
 		 */
+		//Go back to get ready to write over the old key with our new line of input
 		status = fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
 	}
 	status = fwrite(args.toString, 1, strlen(args.toString), mahFile);
@@ -141,7 +133,12 @@ int main(int argc, char * argv[]) {
 	//Write encrypted MD5
 	encryptedFileWithInputMD5 = aes_encrypt(&en, fileWithInputMD5, len);
 	status = fwrite(encryptedFileWithInputMD5, 1, MD5_DIGEST_LENGTH, mahFile);
-	debug("Wrote the encrypted MD5: %s", encryptedFileWithInputMD5);
+	printf("Wrote the encrypted MD5:    ");
+	printMD5(encryptedFileWithInputMD5);
+
+
+
+	//Cleanup
 	fclose(mahFile);
 	fflush(mahFile);
 	EVP_CIPHER_CTX_cleanup(&en);
@@ -150,134 +147,12 @@ int main(int argc, char * argv[]) {
 
 }
 
-off_t fsize(const char *filename) {
-	struct stat st;
-
-	if (stat(filename, &st) == 0)
-		return st.st_size;
-
-	return -1;
+void printMD5(char * toPrint) {
+	int i;
+	printf("0x");
+	for (i = 0; i < MD5_DIGEST_LENGTH; i++)
+		printf("%02x", (unsigned char)toPrint[i]);
+	printf("%s", "\n");
 }
 
-int check_logic(logappend_args * args) {
-	char * name = NULL;
-	if (args->employeeName == NULL) {
-		name = args->guestName;
 
-	} else {
-		name = args->employeeName;
-	}
-
-	logicUser* newUser = ht_get(allMahHashes, name);
-	if (newUser == NULL) {
-		newUser = malloc(sizeof(logicUser));
-		strcpy(newUser->name, name);
-		newUser->inBuilding = 0;
-		newUser->inRoom = 0;
-		newUser->roomID = 0;
-		ht_put(allMahHashes, newUser->name, newUser);
-	}
-
-	logicUser* temp = newUser;
-
-	//LOGIC MATRIX ACTION!!!!
-	if (args->eventArrival) {
-		if (args->roomID == -1 && !temp->inBuilding) {
-			temp->inBuilding = 1;
-		} else if (args->roomID == -1 && temp->inBuilding) {
-			return -1;
-		} else if (args->roomID != -1 && !temp->inBuilding) {
-			return -1;
-		} else if (args->roomID != -1 && temp->inRoom) {
-			return -1;
-		} else if (args->roomID != -1 && !temp->inRoom) {
-			temp->inRoom = 1;
-			temp->roomID = args->roomID;
-		}
-
-	} else if (args->eventDeparture) {
-		if (args->roomID == -1 && temp->inBuilding) {
-			temp->inBuilding = 0;
-		} else if (args->roomID == -1 && !temp->inBuilding) {
-			return -1;
-		} else if (args->roomID != -1 && !temp->inBuilding) {
-			return -1;
-		} else if (args->roomID != -1 && !temp->inRoom) {
-			return -1;
-		} else if (args->roomID != -1 && temp->inRoom) {
-			if (args->roomID != temp->roomID) {
-				return -1;
-			}
-			temp->inRoom = 0;
-			temp->roomID = 0;
-		}
-	}
-	return 1;
-}
-
-/**
- * Create an 256 bit key and IV using the supplied key_data. salt can be added for taste.
- * Fills in the encryption and decryption ctx objects and returns 0 on success
- **/
-int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *e_ctx, EVP_CIPHER_CTX *d_ctx) {
-	int i, nrounds = 5;
-	unsigned char key[32], iv[32];
-
-	/*
-	 * Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material.
-	 * nrounds is the number of times the we hash the material. More rounds are more secure but
-	 * slower.
-	 */
-	i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
-	if (i != 32) {
-		printf("Key size is %d bits - should be 256 bits\n", i);
-		return -1;
-	}
-
-	EVP_CIPHER_CTX_init(e_ctx);
-	EVP_EncryptInit_ex(e_ctx, EVP_aes_256_cbc(), NULL, key, iv);
-	EVP_CIPHER_CTX_init(d_ctx);
-	EVP_DecryptInit_ex(d_ctx, EVP_aes_256_cbc(), NULL, key, iv);
-
-	return 0;
-}
-
-/*
- * Encrypt *len bytes of data
- * All data going in & out is considered binary (unsigned char[])
- */
-unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len) {
-	/* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
-	int c_len = *len + AES_BLOCK_SIZE;
-	int f_len = 0;
-	unsigned char *ciphertext = malloc(c_len);
-
-	/* allows reusing of 'e' for multiple encryption cycles */
-	EVP_EncryptInit_ex(e, NULL, NULL, NULL, NULL);
-
-	/* update ciphertext, c_len is filled with the length of ciphertext generated,
-	 *len is the size of plaintext in bytes */
-	EVP_EncryptUpdate(e, ciphertext, &c_len, plaintext, *len);
-
-	/* update ciphertext with the final remaining bytes */
-	EVP_EncryptFinal_ex(e, ciphertext + c_len, &f_len);
-
-	*len = c_len + f_len;
-	return ciphertext;
-}
-
-/*
- * Decrypt *len bytes of ciphertext
- */
-unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len) {
-	/* because we have padding ON, we must allocate an extra cipher block size of memory */
-	int p_len = *len, f_len = 0;
-	unsigned char *plaintext = malloc(p_len + AES_BLOCK_SIZE);
-
-	EVP_DecryptInit_ex(e, NULL, NULL, NULL, NULL);
-	EVP_DecryptUpdate(e, plaintext, &p_len, ciphertext, *len);
-	EVP_DecryptFinal_ex(e, plaintext + p_len, &f_len);
-
-	*len = p_len + f_len;
-	return plaintext;
-}
