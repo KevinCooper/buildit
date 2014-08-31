@@ -2,6 +2,8 @@
 #include "../src/args.h"
 #include "../src/args.c"
 #include "../src/definitions.h"
+#include "../src/logappend.c"
+#include "../src/logappend.h"
 #include <unistd.h>
 #include <string.h>
 
@@ -64,6 +66,14 @@ char *test_parse_args_bad_flags() {
 	mu_assert(args.returnStatus == -1, "Function did not return an error");
 	return NULL;
 }
+char *test_log_append() {
+	char *argv[] = { "program_name", "-T", "4", "-K", "secret", "-A", "-G", "Jill", "-R", "1",
+			"log1", NULL };
+	int argc = 11;
+
+	run_me(argc, argv);
+	return NULL;
+}
 
 char *all_tests() {
 	mu_suite_start();
@@ -73,6 +83,7 @@ char *all_tests() {
 	mu_run_test(test_parse_args_basic_3);
 	mu_run_test(test_parse_args_basic_4);
 	mu_run_test(test_parse_args_bad_flags);
+	mu_run_test(test_log_append);
 	return NULL;
 }
 
