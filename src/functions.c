@@ -1,5 +1,13 @@
 #include "functions.h"
 
+void printMD5(char * toPrint) {
+	int i;
+	printf("0x");
+	for (i = 0; i < MD5_DIGEST_LENGTH; i++)
+		printf("%02x", (unsigned char) toPrint[i]);
+	printf("%s", "\n");
+}
+
 off_t fsize(const char *filename) {
 	struct stat st;
 
@@ -31,7 +39,7 @@ int check_logic(logappend_args * args) {
 	logicUser* temp = newUser;
 
 	//LOGIC MATRIX ACTION!!!!
-	if (args->eventArrival) {
+	if (args->eventArrival == 1) {
 		if (args->roomID == -1 && !temp->inBuilding) {
 			temp->inBuilding = 1;
 		} else if (args->roomID == -1 && temp->inBuilding) {
@@ -45,7 +53,7 @@ int check_logic(logappend_args * args) {
 			temp->roomID = args->roomID;
 		}
 
-	} else if (args->eventDeparture) {
+	} else if (args->eventDeparture == 1) {
 		if (args->roomID == -1 && temp->inBuilding) {
 			temp->inBuilding = 0;
 		} else if (args->roomID == -1 && !temp->inBuilding) {
