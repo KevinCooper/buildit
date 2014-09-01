@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include "dbg.h"
 #include "args.h"
+#include "functions.h"
 
 #define TRY do{ jmp_buf ex_buf__; if( !setjmp(ex_buf__) ){
 #define CATCH } else {
@@ -33,7 +34,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 //TODO: Check for invalid inputs (Token Flag with no opt, will give ":" )
 
 	while ((c = getopt(argc, argv, "T:B:K:E:G:ALR:")) != -1) {
-//		debug("%d", c);
+		//debug("%c", c);
 		switch (c) {
 		case 'T':
 			args.timestamp = atoi(optarg);
@@ -48,8 +49,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 			//TODO: Verify that token is alphanumeric
 			len = strlen(optarg);
 			args.token = (char *) malloc(len + 1);
-			args.token = strdup(optarg);
-			*(args.token + len) = '\0';
+			strcpy(args.token, optarg);
 			break;
 		case 'E':
 			//TODO: verify that name is upper/lowercase letters.  No spaces.
@@ -80,7 +80,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 				debug("Unknown option character `\\x%x'.\n", optopt);
 			break;
 		default:
-			goto BAD;
+			invalid();
 		}
 	}
 
@@ -95,28 +95,23 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 	//		args.batchFile);
 
 	if (args.batchFile != NULL) {
-		args.returnStatus = 1;
+
 	} else if (args.timestamp
 			== -1|| args.token == NULL || args.logName == NULL) {
-		args.returnStatus = -1;
+
 	} else if ((args.eventArrival == -1 && args.eventDeparture == -1)
 			|| (args.eventArrival == 1 && args.eventDeparture == 1)) {
-		args.returnStatus = -1;
+		invalid();
 	} else if ((args.employeeName == NULL && args.guestName == NULL)
 			|| (args.employeeName != NULL && args.guestName != NULL)) {
-		args.returnStatus = -1;
+		invalid();
 	} else if (args.roomID == -1
 			&& !(args.eventDeparture == 1 || args.eventArrival == 1)) {
-		args.returnStatus = -1;
+		invalid();
 	} else {
 		args.returnStatus = 0;
 	}
-	if (args.returnStatus != -1)
-		toString(&args);
-	return args;
-
-	BAD: ;
-	args.returnStatus = -1;
+	toString(&args);
 	return args;
 }
 
