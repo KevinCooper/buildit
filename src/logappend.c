@@ -34,6 +34,7 @@ int main(int argc, char * argv[]) {
 	if (argc < 3)
 		invalid();
 	oldHashExists = 1;
+	oldTime = -1;
 	firstRun = 1;
 	logappend_args args = opt_parser(argc, argv);
 	allMahHashes = ht_create(65536);
@@ -42,10 +43,17 @@ int main(int argc, char * argv[]) {
 		invalid();
 
 	if (args.batchFile) {
+		isBatch = 1;
 		batch(args);
 	} else {
+		isBatch = 0;
 		checkMahFile(args);
 		processLine(args, 1);
+	}
+	if(isBatch){
+		return 0;
+	}else{
+		return 1;
 	}
 }
 
@@ -54,7 +62,6 @@ void batch(logappend_args args) {
 	int32_t fileSize = 0;
 	size_t bytes = 0;
 	ssize_t read = 0;
-	int32_t firstRun = 1;
 	char * line = NULL;
 	char interString[256];
 

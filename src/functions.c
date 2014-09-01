@@ -33,8 +33,13 @@ int check_logic(logappend_args * args) {
 		newUser->inBuilding = 0;
 		newUser->inRoom = 0;
 		newUser->roomID = 0;
+		//TODO: Possible bug in placement of this code
 		ht_put(allMahHashes, newUser->name, newUser);
 	}
+	if (args->timestamp <= oldTime) {
+		invalid();
+	}
+	oldTime = args->timestamp;
 
 	logicUser* temp = newUser;
 
@@ -140,7 +145,11 @@ unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *le
 	return plaintext;
 }
 
-void invalid(){
+void invalid() {
 	printf("invalid\n");
-	exit(-1);
+	if (isBatch) {
+		exit(0);
+	} else {
+		exit(-1);
+	}
 }

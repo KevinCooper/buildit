@@ -76,5 +76,8 @@ typedef enum
 } error_t;
 
 
+int32_t oldTime;
+int32_t isBatch;
+
 
 #endif /* DEFINITIONS_H_ */
