@@ -48,6 +48,8 @@ int main(int argc, char * argv[]) {
 	} else {
 		isBatch = 0;
 		checkMahFile(args);
+		if (check_logic(&args) == -1)
+			invalid();
 		processLine(args, 1);
 	}
 	if(isBatch){
@@ -80,7 +82,9 @@ void batch(logappend_args args) {
 		char ** tempv = argv_split(interString, &tempc);
 		logappend_args temp = opt_parser(tempc, tempv);
 		if (temp.batchFile)
-			invalid();
+			continue;
+		if (check_logic(&args) == -1)
+			continue;
 		if (firstRun) {
 			checkMahFile(temp);
 			firstRun = 0;
@@ -100,8 +104,6 @@ void processLine(logappend_args args, int32_t isLastLine) {
 	FILE* mahFile = NULL;
 	unsigned int md5len = MD5_DIGEST_LENGTH;
 	//Make sure it is a good new first line
-	if (check_logic(&args) == -1)
-		invalid();
 
 	fileSize = fsize(args.logName);
 	if(fileSize < 16){
