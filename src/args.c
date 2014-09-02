@@ -91,7 +91,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 				debug("Unknown option character `\\x%x'.\n", optopt);
 			break;
 		default:
-			exit(-1);
+			invalid();
 		}
 	}
 
@@ -102,7 +102,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 	int32_t exclusive_options = args.toSTDOUT + args.listAllRooms_R + args.totalTime + args.printSpecificRooms_I + args.listEmployeesWithTime
 			+ args.listEmployeesWithoutTime;
 	if (exclusive_options > 1 || exclusive_options < 1)
-		exit(-1);
+		invalid();
 
 	return args;
 }

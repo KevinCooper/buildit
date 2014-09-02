@@ -24,6 +24,6 @@ int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP
 unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len);
 unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len);
 void invalid();
-void checkMahFile(logread_args args);
+
 
 #endif /* FUNCTIONS_H_ */
