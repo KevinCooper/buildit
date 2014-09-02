@@ -16,9 +16,11 @@
 
 void buildDataStructs(logappend_args *temp);
 void doBadThings(logread_args* args);
+void sortLinkedList(Node *head);
 
 HT* allMahHashes;
 Node *peopleHead;
+int32_t highestRoomNum;
 
 int main(int argc, char * argv[]) {
 	peopleHead = NULL;
@@ -72,18 +74,24 @@ void buildDataStructs(logappend_args *temp) {
 	person* currPerson = ht_get(allMahHashes, name);
 	if (currPerson == NULL) {
 		currPerson = malloc(sizeof(person));
+		currPerson->rooms = NULL;
 		strcpy(currPerson->name, name);
 		currPerson->isEmployee = isemployee;
-		if (temp->roomID != -1) {
-			currPerson->roomID = temp->roomID;
-		} else {
-			currPerson->roomID = 0;
-		}
+		//if (temp->roomID != -1) {
+		//	currPerson->roomID = temp->roomID;
+		//} else {
+		currPerson->roomID = -1;
+		//}
 		currPerson->enterTime = temp->timestamp;
 		ht_put(allMahHashes, currPerson->name, currPerson);
 		stack_push(&peopleHead, currPerson);
 	} else if (temp->eventArrival == 1 && temp->roomID != -1) {
 		currPerson->roomID = temp->roomID;
+		int32_t * tempNum = malloc(sizeof(int32_t));
+		*tempNum = temp->roomID;
+		stack_push(&currPerson->rooms, tempNum);
+		if (currPerson->roomID > highestRoomNum)
+			highestRoomNum = currPerson->roomID;
 	} else if (temp->eventDeparture == 1 && temp->roomID == -1) {
 		currPerson->leaveTime = temp->timestamp;
 	} else {
@@ -93,24 +101,82 @@ void buildDataStructs(logappend_args *temp) {
 }
 
 void doBadThings(logread_args* args) {
-	tree_node *employees = NULL;
-	tree_node *guests = NULL;
-	Node* temp = peopleHead;
+	sortLinkedList(peopleHead);
+	int32_t currRoom;
 	if (args->currentState) {
+		Node* temp = peopleHead;
+		printf("Gallery employees are: ");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
-			if (tempP->isEmployee) {
-				insert(employees, tempP->name);
-			} else {
-				insert(guests, tempP->name);
+			if (tempP->roomID == -1 && tempP->isEmployee) {
+				printf("%s", tempP->name);
+				if (temp->next != NULL)
+					printf(",");
+			}
+			temp = temp->next;
+
+		}
+		temp = peopleHead;
+		printf("\nGallery guests are: ");
+		while (temp) {
+			person* tempP = (person *) (temp->data);
+			if (tempP->roomID == -1 && !tempP->isEmployee) {
+				printf("%s", tempP->name);
+				if (temp->next != NULL)
+					printf(",");
 			}
 			temp = temp->next;
 		}
+		printf("\n");
+		for (currRoom = 0; currRoom <= highestRoomNum; currRoom++) {
+			Node* temp = peopleHead;
+			printf("%d: ", currRoom);
+			while (temp) {
+				person* tempP = (person *) (temp->data);
+				if (tempP->roomID == currRoom) {
+					printf("%s", tempP->name);
+					if (temp->next != NULL)
+						printf(",");
+				}
+				temp = temp->next;
+			}
+			printf("\n");
+		}
+
+	} else if (args->listAllRooms_R) {
+		person* blahzz;
+		if (args->employeeName != NULL) {
+			blahzz = ht_get(allMahHashes, args->employeeName);
+		} else {
+			blahzz = ht_get(allMahHashes, args->guestName);
+		}
+		Node* temp = blahzz->rooms;
+		while (temp) {
+			int32_t* num = (int32_t*) (temp->data);
+			printf("%d\n", *num);
+			temp = temp->next;
+		}
 	}
-	printf("The employees are: ");
-	print_tree(employees);
-	printf("\nThe guests are: ");
-	print_tree(guests);
+
 	printf("\n");
+
+}
+
+void sortLinkedList(Node *head) {
+	Node *temp;
+
+	/* since the compare dereferences temp->next you'll have to verify that it is not NULL */
+	for (temp = head; temp && temp->next; temp = temp->next) {
+		person* blah = (person *) temp->data;
+		person * blahNext = (person *) temp->next->data;
+		if (strcmp(blah->name, blahNext->name) > 0) {
+			/* no need for a whole node, since you only copy a pointer */
+			person *cp;
+			cp = temp->data;
+			temp->data = temp->next->data;
+			temp->next->data = cp;
+		}
+
+	}
 
 }

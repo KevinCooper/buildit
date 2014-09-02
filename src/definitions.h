@@ -21,6 +21,7 @@ typedef struct Person {
 	uint32_t roomID;
 	uint32_t enterTime;
 	uint32_t leaveTime;
+	Node * rooms;
 } person;
 
 typedef struct {

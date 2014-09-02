@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "definitions.h"
+
 
 typedef void * stack_data; //stack data type
 typedef struct stack Node; //short name for the stack type
