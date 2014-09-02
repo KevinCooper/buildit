@@ -29,7 +29,8 @@ unsigned char newMD5String[MD5_DIGEST_LENGTH + 1];
 uint32_t oldHashExists;
 uint32_t firstRun;
 
-HT* allMahHashes = NULL;
+HT* allMahHashes_guests = NULL;
+HT* allMahHashes_employees = NULL;
 
 int main(int argc, char * argv[]) {
 	if (argc < 3)
@@ -38,7 +39,8 @@ int main(int argc, char * argv[]) {
 	oldTime = -1;
 	firstRun = 1;
 	logappend_args args = opt_parser(argc, argv);
-	allMahHashes = ht_create(65536);
+	allMahHashes_employees = ht_create(65536);
+	allMahHashes_guests = ht_create(65536);
 
 	if (args.returnStatus == -1)
 		invalid();

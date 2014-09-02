@@ -19,14 +19,16 @@ off_t fsize(const char *filename) {
 
 int check_logic(logappend_args * args) {
 	char * name = NULL;
+	logicUser* newUser = NULL;
 	if (args->employeeName == NULL) {
 		name = args->guestName;
+		newUser = ht_get(allMahHashes_guests, name);
 
 	} else {
 		name = args->employeeName;
+		newUser = ht_get(allMahHashes_employees, name);
 	}
 
-	logicUser* newUser = ht_get(allMahHashes, name);
 	if (newUser == NULL) {
 		newUser = malloc(sizeof(logicUser));
 		strcpy(newUser->name, name);
@@ -34,7 +36,11 @@ int check_logic(logappend_args * args) {
 		newUser->inRoom = 0;
 		newUser->roomID = 0;
 		//TODO: Possible bug in placement of this code
-		ht_put(allMahHashes, newUser->name, newUser);
+		if(args->employeeName != NULL){
+			ht_put(allMahHashes_employees, newUser->name, newUser);
+		}else{
+			ht_put(allMahHashes_guests, newUser->name, newUser);
+		}
 	}
 	if (args->timestamp <= oldTime) {
 		invalid();
@@ -61,6 +67,7 @@ int check_logic(logappend_args * args) {
 	} else if (args->eventDeparture == 1) {
 		if (args->roomID == -1 && temp->inBuilding) {
 			temp->inBuilding = 0;
+			temp->roomID = -1;
 		} else if (args->roomID == -1 && !temp->inBuilding) {
 			invalid();
 		} else if (args->roomID != -1 && !temp->inBuilding) {

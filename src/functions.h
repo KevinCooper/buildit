@@ -22,7 +22,8 @@
 #include <openssl/evp.h>
 #include <openssl/aes.h>
 
-HT* allMahHashes;
+extern HT* allMahHashes_guests;
+extern HT* allMahHashes_employees;
 
 off_t fsize(const char *filename);
 int check_logic(logappend_args * args);
