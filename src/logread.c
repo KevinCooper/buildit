@@ -109,7 +109,7 @@ void doBadThings(logread_args* args) {
 		printf("Gallery employees are: ");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
-			if (tempP->roomID == -1 && tempP->isEmployee) {
+			if (tempP->isEmployee) {
 				if (!isFirst)
 					printf(",");
 				isFirst = 0;
@@ -123,7 +123,7 @@ void doBadThings(logread_args* args) {
 		printf("\nGallery guests are: ");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
-			if (tempP->roomID == -1 && !tempP->isEmployee) {
+			if (!tempP->isEmployee) {
 				if (!isFirst)
 					printf(",");
 				isFirst = 0;
