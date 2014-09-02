@@ -7,6 +7,7 @@ C_SRCS += \
 ../src/args.c \
 ../src/args_log.c \
 ../src/argv.c \
+../src/dictionary.c \
 ../src/functions.c \
 ../src/hash.c \
 ../src/list.c \
@@ -16,6 +17,7 @@ OBJS += \
 ./src/args.o \
 ./src/args_log.o \
 ./src/argv.o \
+./src/dictionary.o \
 ./src/functions.o \
 ./src/hash.o \
 ./src/list.o \
@@ -25,6 +27,7 @@ C_DEPS += \
 ./src/args.d \
 ./src/args_log.d \
 ./src/argv.d \
+./src/dictionary.d \
 ./src/functions.d \
 ./src/hash.d \
 ./src/list.d \

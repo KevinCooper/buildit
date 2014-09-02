@@ -26,7 +26,7 @@ typedef struct Person {
 typedef struct {
 	char * token;
 	uint32_t inHTML;
-	uint32_t toSTDOUT;
+	uint32_t currentState;
 	uint32_t totalTime;
 	uint32_t listAllRooms_R;
 	uint32_t printSpecificRooms_I;

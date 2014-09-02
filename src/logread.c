@@ -12,8 +12,10 @@
 #include "args_log.h"
 #include "argv.h"
 #include "hash.h"
+#include "dictionary.h"
 
 void buildDataStructs(logappend_args *temp);
+void doBadThings(logread_args* args);
 
 HT* allMahHashes;
 Node *peopleHead;
@@ -52,6 +54,7 @@ int main(int argc, char * argv[]) {
 		argv_free(tempv);
 		// FINISH LOGICZ
 	}
+	doBadThings(&args);
 	return 0;
 }
 
@@ -84,7 +87,30 @@ void buildDataStructs(logappend_args *temp) {
 	} else if (temp->eventDeparture == 1 && temp->roomID == -1) {
 		currPerson->leaveTime = temp->timestamp;
 	} else {
-		currPerson->roomID =0;
+		currPerson->roomID = 0;
 	}
+
+}
+
+void doBadThings(logread_args* args) {
+	tree_node *employees = NULL;
+	tree_node *guests = NULL;
+	Node* temp = peopleHead;
+	if (args->currentState) {
+		while (temp) {
+			person* tempP = (person *) (temp->data);
+			if (tempP->isEmployee) {
+				insert(employees, tempP->name);
+			} else {
+				insert(guests, tempP->name);
+			}
+			temp = temp->next;
+		}
+	}
+	printf("The employees are: ");
+	print_tree(employees);
+	printf("\nThe guests are: ");
+	print_tree(guests);
+	printf("\n");
 
 }

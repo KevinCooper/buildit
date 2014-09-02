@@ -21,7 +21,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 	args.guestName = NULL;
 	args.logName = NULL;
 	args.inHTML = 0;
-	args.toSTDOUT = 0;
+	args.currentState = 0;
 	args.totalTime = 0;
 	args.listAllRooms_R = 0;
 	args.printSpecificRooms_I = 0;
@@ -42,7 +42,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			args.inHTML = 1;
 			break;
 		case 'S':
-			args.toSTDOUT = 1;
+			args.currentState = 1;
 			break;
 		case 'R':
 			args.listAllRooms_R = 1;
@@ -99,7 +99,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 	if (index < argc) {
 		args.logName = argv[index];
 	}
-	int32_t exclusive_options = args.toSTDOUT + args.listAllRooms_R + args.totalTime + args.printSpecificRooms_I + args.listEmployeesWithTime
+	int32_t exclusive_options = args.currentState + args.listAllRooms_R + args.totalTime + args.printSpecificRooms_I + args.listEmployeesWithTime
 			+ args.listEmployeesWithoutTime;
 	if (exclusive_options > 1 || exclusive_options < 1)
 		invalid();
