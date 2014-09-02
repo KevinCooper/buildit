@@ -16,6 +16,7 @@
 void batch(logappend_args args);
 void processLine(logappend_args args, int32_t CheckAndHashBool);
 void checkMahFile(logappend_args args);
+void inter(logappend_args args);
 
 MD5_CTX oldMD5;
 MD5_CTX currentMD5;
@@ -48,6 +49,7 @@ int main(int argc, char * argv[]) {
 	} else {
 		isBatch = 0;
 		checkMahFile(args);
+		inter(args);
 		if (check_logic(&args) == -1)
 			invalid();
 		processLine(args, 1);
@@ -57,6 +59,40 @@ int main(int argc, char * argv[]) {
 	} else {
 		return 1;
 	}
+}
+
+void inter(logappend_args args) {
+	int32_t fileSize = 0;
+	FILE* mahFile = NULL;
+	size_t bytes = 0;
+	ssize_t read = 0;
+	char * line = NULL;
+	char interString[256];
+	unsigned int md5len = MD5_DIGEST_LENGTH;
+
+	fileSize = fsize(args.logName);
+	if (fileSize < 16) {
+		return;
+	} else {
+		mahFile = fopen(args.logName, "r");
+	}
+
+	while ((read = getline(&line, &bytes, mahFile)) != -1 && fileSize > 16) {
+
+		int len = strlen(line);
+		fileSize = fileSize - len;
+		bzero(interString, 256);
+		// RERUN COMMANDS CAUZE LOGIC!
+		sprintf(interString, "./logappend %s", line);
+		int tempc;
+		char ** tempv = argv_split(interString, &tempc);
+		logappend_args temp = opt_parser(tempc, tempv);
+		if (check_logic(&temp) == -1)
+			continue;
+		argv_free(tempv);
+		// FINISH LOGICZ
+	}
+	fclose(mahFile);
 }
 
 void batch(logappend_args args) {
