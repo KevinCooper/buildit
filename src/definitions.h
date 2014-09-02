@@ -9,6 +9,19 @@
 #define DEFINITIONS_H_
 
 #include <stdint.h>
+#include "hash.h"
+#include "list.h"
+
+#define MAX 1024
+
+
+typedef struct Person {
+	char name[256];
+	uint32_t isEmployee;
+	uint32_t roomID;
+	uint32_t enterTime;
+	uint32_t leaveTime;
+} person;
 
 typedef struct {
 	char * token;
@@ -21,14 +34,13 @@ typedef struct {
 	uint32_t listEmployeesWithoutTime;
 	char * employeeName;
 	char * guestName;
-	int32_t  lowerBound;
+	int32_t lowerBound;
 	int32_t upperBound;
 	char * logName;
 
-}logread_args;
+} logread_args;
 
-typedef struct
-{
+typedef struct {
 	/*
 	 *   Positive number of seconds since gallery opened.  Time should always increase.
 	 *   Invoking logappend with event prior to time of most recent log is an error
@@ -69,12 +81,9 @@ typedef struct
 
 	int returnStatus;
 
-
 	//String representation
 	char * toString;
 
-}logappend_args;
-
-
+} logappend_args;
 
 #endif /* DEFINITIONS_H_ */

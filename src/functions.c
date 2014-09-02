@@ -91,4 +91,54 @@ void invalid() {
 
 }
 
+void checkMahFile(logread_args args) {
+	int32_t fileSize = 0;
+	FILE* mahFile = NULL;
+	char * pathname = args.logName;
+	MD5_CTX currentMD5;
+
+	unsigned int md5len = MD5_DIGEST_LENGTH;
+	char* oldMD5 = calloc(MD5_DIGEST_LENGTH + 1, 1);
+	MD5_Init(&currentMD5);
+	char * line = NULL;
+	size_t bytes = 0;
+	ssize_t read;
+	int status = 0;
+
+	fileSize = fsize(pathname);
+	if (fileSize > 16) {
+		mahFile = fopen(pathname, "r+");
+	} else {
+		return;
+	}
+	//Create an MD5 of the file and verify the syntax stuff
+	while ((read = getline(&line, &bytes, mahFile)) != -1 && fileSize > 16) {
+		int len = strlen(line);
+		fileSize = fileSize - len;
+		MD5_Update(&currentMD5, line, len);
+	}
+	char currentMD5_S[MD5_DIGEST_LENGTH + 1];
+	MD5_Final(currentMD5_S, &currentMD5);
+
+	//Read encrypted MD5 from the file
+	status = fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
+	status = fread(oldMD5, sizeof(unsigned char), MD5_DIGEST_LENGTH, mahFile);
+
+	//Decrypt the old MD5
+	EVP_CIPHER_CTX en, de;
+	unsigned int salt[] = { 12345, 54321 };
+	if (aes_init(args.token, strlen(args.token), (unsigned char *) &salt, &en, &de)) {
+		printf("Couldn't initialize AES cipher\n");
+		invalid();
+	}
+	char* oldMD5_de_S = (char *) aes_decrypt(&de, oldMD5, &md5len);
+
+	if (memcmp(oldMD5_de_S, currentMD5_S, MD5_DIGEST_LENGTH)) {
+		invalid();
+	}
+
+	fclose(mahFile);
+	return;
+}
+
 
