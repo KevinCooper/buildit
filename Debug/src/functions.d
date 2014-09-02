@@ -1,0 +1,6 @@
+src/functions.d: ../src/functions.c ../src/functions.h \
+ ../src/definitions.h
+
+../src/functions.h:
+
+../src/definitions.h:
