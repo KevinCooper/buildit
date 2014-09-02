@@ -103,40 +103,47 @@ void buildDataStructs(logappend_args *temp) {
 void doBadThings(logread_args* args) {
 	sortLinkedList(peopleHead);
 	int32_t currRoom;
+	uint32_t isFirst = 1;
 	if (args->currentState) {
 		Node* temp = peopleHead;
 		printf("Gallery employees are: ");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
 			if (tempP->roomID == -1 && tempP->isEmployee) {
-				printf("%s", tempP->name);
-				if (temp->next != NULL)
+				if (!isFirst)
 					printf(",");
+				isFirst = 0;
+				printf("%s", tempP->name);
 			}
 			temp = temp->next;
 
 		}
+		isFirst = 1;
 		temp = peopleHead;
 		printf("\nGallery guests are: ");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
 			if (tempP->roomID == -1 && !tempP->isEmployee) {
-				printf("%s", tempP->name);
-				if (temp->next != NULL)
+				if (!isFirst)
 					printf(",");
+				isFirst = 0;
+				printf("%s", tempP->name);
 			}
 			temp = temp->next;
 		}
 		printf("\n");
 		for (currRoom = 0; currRoom <= highestRoomNum; currRoom++) {
+			isFirst = 1;
 			Node* temp = peopleHead;
 			printf("%d: ", currRoom);
 			while (temp) {
 				person* tempP = (person *) (temp->data);
 				if (tempP->roomID == currRoom) {
-					printf("%s", tempP->name);
-					if (temp->next != NULL)
+					if (!isFirst)
 						printf(",");
+					isFirst = 0;
+					printf("%s", tempP->name);
+
 				}
 				temp = temp->next;
 			}
@@ -151,14 +158,19 @@ void doBadThings(logread_args* args) {
 			blahzz = ht_get(allMahHashes, args->guestName);
 		}
 		Node* temp = blahzz->rooms;
+		uint32_t isFirst = 1;
 		while (temp) {
 			int32_t* num = (int32_t*) (temp->data);
-			printf("%d\n", *num);
+			if (!isFirst)
+				printf(",");
+			isFirst = 0;
+			printf("%d", *num);
 			temp = temp->next;
 		}
 	}
 
 	printf("\n");
+	fflush(stdout);
 
 }
 
