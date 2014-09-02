@@ -1,6 +1,6 @@
 src/logread.d: ../src/logread.c ../src/args.h ../src/definitions.h \
  ../src/hash.h ../src/list.h ../src/functions.h ../src/args_log.h \
- ../src/argv.h ../src/dictionary.h
+ ../src/argv.h ../src/dictionary.h ../src/htmlPrint.h
 
 ../src/args.h:
 
@@ -17,3 +17,5 @@ src/logread.d: ../src/logread.c ../src/args.h ../src/definitions.h \
 ../src/argv.h:
 
 ../src/dictionary.h:
+
+../src/htmlPrint.h:

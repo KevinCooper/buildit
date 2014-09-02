@@ -13,6 +13,7 @@
 #include "argv.h"
 #include "hash.h"
 #include "dictionary.h"
+#include "htmlPrint.h"
 
 void buildDataStructs(logappend_args *temp);
 void doBadThings(logread_args* args);
@@ -158,14 +159,22 @@ void doBadThings(logread_args* args) {
 		}
 		Node* temp = blahzz->rooms;
 		uint32_t isFirst = 1;
+		if (args->inHTML)
+			init_R();
 		while (temp) {
 			int32_t* num = (int32_t*) (temp->data);
-			if (!isFirst)
-				printf(",");
-			isFirst = 0;
-			printf("%d", *num);
+			if (args->inHTML) {
+				print_R_element(num);
+			} else {
+				if (!isFirst)
+					printf(",");
+				isFirst = 0;
+				printf("%d", *num);
+			}
 			temp = temp->next;
 		}
+		if (args->inHTML)
+			printFooter();
 	}
 	printf("\n");
 	fflush(stdout);

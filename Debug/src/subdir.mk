@@ -10,6 +10,7 @@ C_SRCS += \
 ../src/dictionary.c \
 ../src/functions.c \
 ../src/hash.c \
+../src/htmlPrint.c \
 ../src/list.c \
 ../src/logread.c 
 
@@ -20,6 +21,7 @@ OBJS += \
 ./src/dictionary.o \
 ./src/functions.o \
 ./src/hash.o \
+./src/htmlPrint.o \
 ./src/list.o \
 ./src/logread.o 
 
@@ -30,6 +32,7 @@ C_DEPS += \
 ./src/dictionary.d \
 ./src/functions.d \
 ./src/hash.d \
+./src/htmlPrint.d \
 ./src/list.d \
 ./src/logread.d 
 
