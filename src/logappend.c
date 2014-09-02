@@ -52,9 +52,9 @@ int main(int argc, char * argv[]) {
 			invalid();
 		processLine(args, 1);
 	}
-	if(isBatch){
+	if (isBatch) {
 		return 0;
-	}else{
+	} else {
 		return 1;
 	}
 }
@@ -83,7 +83,7 @@ void batch(logappend_args args) {
 		logappend_args temp = opt_parser(tempc, tempv);
 		if (temp.batchFile)
 			continue;
-		if (check_logic(&args) == -1)
+		if (check_logic(&temp) == -1)
 			continue;
 		if (firstRun) {
 			checkMahFile(temp);
@@ -98,7 +98,7 @@ void batch(logappend_args args) {
 }
 
 void processLine(logappend_args args, int32_t isLastLine) {
-	unsigned char * newMD5_S;
+	unsigned char newMD5_S[MD5_DIGEST_LENGTH + 1];
 	MD5_Update(&newMD5, args.toString, strlen(args.toString));
 	int32_t fileSize = 0;
 	FILE* mahFile = NULL;
@@ -106,9 +106,9 @@ void processLine(logappend_args args, int32_t isLastLine) {
 	//Make sure it is a good new first line
 
 	fileSize = fsize(args.logName);
-	if(fileSize < 16){
+	if (fileSize < 16) {
 		mahFile = fopen(args.logName, "w+");
-	}else{
+	} else {
 		mahFile = fopen(args.logName, "r+");
 	}
 	//Write the current line to the file
@@ -164,7 +164,7 @@ void checkMahFile(logappend_args args) {
 		MD5_Update(&currentMD5, line, len);
 		MD5_Update(&newMD5, line, len);
 	}
-	char *currentMD5_S = NULL;
+	unsigned char currentMD5_S[MD5_DIGEST_LENGTH + 1];
 	MD5_Final(currentMD5_S, &currentMD5);
 
 	//Read encrypted MD5 from the file
@@ -180,7 +180,7 @@ void checkMahFile(logappend_args args) {
 	}
 	char* oldMD5_de_S = (char *) aes_decrypt(&de, oldMD5, &md5len);
 
-	if (!memcmp(oldMD5_de_S, currentMD5_S, MD5_DIGEST_LENGTH)) {
+	if (memcmp(oldMD5_de_S, currentMD5_S, MD5_DIGEST_LENGTH)) {
 		invalid();
 	}
 
