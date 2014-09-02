@@ -129,10 +129,10 @@ void * toString(logappend_args* args) {
 			strcat(string, "-A ");
 		}
 		if (args->employeeName == NULL) {
-			strcat(string, "-E ");
+			strcat(string, "-G ");
 			strcat(string, args->guestName);
 		} else {
-			strcat(string, "-G ");
+			strcat(string, "-E ");
 			strcat(string, args->employeeName);
 		}
 		if (args->roomID != -1) {

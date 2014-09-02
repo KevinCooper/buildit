@@ -160,8 +160,6 @@ void checkMahFile(logappend_args args) {
 	//Create an MD5 of the file and verify the syntax stuff
 	while ((read = getline(&line, &bytes, mahFile)) != -1 && fileSize > 16) {
 		int len = strlen(line);
-		if (check_logic(&args) == -1)
-			invalid();
 		fileSize = fileSize - len;
 		MD5_Update(&currentMD5, line, len);
 		MD5_Update(&newMD5, line, len);
