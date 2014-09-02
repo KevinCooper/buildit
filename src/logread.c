@@ -106,7 +106,6 @@ void doBadThings(logread_args* args) {
 	uint32_t isFirst = 1;
 	if (args->currentState) {
 		Node* temp = peopleHead;
-		printf("Gallery employees are: ");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
 			if (tempP->isEmployee) {
@@ -120,7 +119,7 @@ void doBadThings(logread_args* args) {
 		}
 		isFirst = 1;
 		temp = peopleHead;
-		printf("\nGallery guests are: ");
+		printf("\n");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
 			if (!tempP->isEmployee) {
@@ -168,7 +167,6 @@ void doBadThings(logread_args* args) {
 			temp = temp->next;
 		}
 	}
-
 	printf("\n");
 	fflush(stdout);
 
