@@ -7,4 +7,5 @@ logappend:
 	gcc -O3 logAppendSrc/* -o build/logappend -lssl -lcrypto
 
 clean:
-	rm build/*
+	rm build/logappend
+	rm build/logread

@@ -18,9 +18,10 @@
 typedef struct Person {
 	char name[256];
 	uint32_t isEmployee;
-	uint32_t roomID;
+	int32_t roomID;
 	uint32_t enterTime;
 	uint32_t leaveTime;
+	uint32_t inBuilding;
 	Node * rooms;
 } person;
 

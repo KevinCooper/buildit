@@ -80,6 +80,7 @@ void buildDataStructs(logappend_args *temp) {
 		strcpy(currPerson->name, name);
 		currPerson->isEmployee = isemployee;
 		currPerson->roomID = -1;
+		currPerson->inBuilding = 1;
 		currPerson->enterTime = temp->timestamp;
 		ht_put(allMahHashes, currPerson->name, currPerson);
 		stack_push(&peopleHead, currPerson);
@@ -92,8 +93,9 @@ void buildDataStructs(logappend_args *temp) {
 			highestRoomNum = currPerson->roomID;
 	} else if (temp->eventDeparture == 1 && temp->roomID == -1) {
 		currPerson->leaveTime = temp->timestamp;
+		currPerson->inBuilding = 0;
 	} else {
-		currPerson->roomID = 0;
+		currPerson->roomID = -1;
 	}
 
 }
@@ -110,7 +112,7 @@ void doBadThings(logread_args* args) {
 		Node* temp = peopleHead;
 		while (temp) {
 			person* tempP = (person *) (temp->data);
-			if (tempP->isEmployee) {
+			if (tempP->isEmployee && tempP->inBuilding) {
 				if (!isFirst)
 					printf(",");
 				isFirst = 0;
@@ -124,7 +126,7 @@ void doBadThings(logread_args* args) {
 		printf("\n");
 		while (temp) {
 			person* tempP = (person *) (temp->data);
-			if (!tempP->isEmployee) {
+			if (!tempP->isEmployee && tempP->inBuilding) {
 				if (!isFirst)
 					printf(",");
 				isFirst = 0;
@@ -136,10 +138,11 @@ void doBadThings(logread_args* args) {
 		for (currRoom = 0; currRoom <= highestRoomNum; currRoom++) {
 			isFirst = 1;
 			Node* temp = peopleHead;
-			printf("%d: ", currRoom);
 			while (temp) {
 				person* tempP = (person *) (temp->data);
 				if (tempP->roomID == currRoom) {
+					if (isFirst)
+						printf("%d: ", currRoom);
 					if (!isFirst)
 						printf(",");
 					isFirst = 0;
@@ -148,7 +151,8 @@ void doBadThings(logread_args* args) {
 				}
 				temp = temp->next;
 			}
-			printf("\n");
+			if (!isFirst)
+				printf("\n");
 		}
 
 	} else if (args->listAllRooms_R) {
@@ -220,10 +224,11 @@ void whyIsTheHTMLFormatDifferent_S(logread_args* args) {
 	for (currRoom = 0; currRoom <= highestRoomNum; currRoom++) {
 		isFirst = 1;
 		Node* temp = peopleHead;
-		printf("<tr>\n\t<td>%d</td>\n\t<td>", currRoom);
 		while (temp) {
 			person* tempP = (person *) (temp->data);
 			if (tempP->roomID == currRoom) {
+				if (isFirst)
+					printf("<tr>\n\t<td>%d</td>\n\t<td>", currRoom);
 				if (!isFirst)
 					printf(",");
 				isFirst = 0;
@@ -232,7 +237,8 @@ void whyIsTheHTMLFormatDifferent_S(logread_args* args) {
 			}
 			temp = temp->next;
 		}
-		printf("</td>\n</tr>\n");
+		if (!isFirst)
+			printf("</td>\n</tr>\n");
 	}
 
 	printFooter();
@@ -241,19 +247,21 @@ void whyIsTheHTMLFormatDifferent_S(logread_args* args) {
 
 void sortLinkedList(Node *head) {
 	Node *temp;
-
+	int i;
 	/* since the compare dereferences temp->next you'll have to verify that it is not NULL */
-	for (temp = head; temp && temp->next; temp = temp->next) {
-		person* blah = (person *) temp->data;
-		person * blahNext = (person *) temp->next->data;
-		if (strcmp(blah->name, blahNext->name) > 0) {
-			/* no need for a whole node, since you only copy a pointer */
-			person *cp;
-			cp = temp->data;
-			temp->data = temp->next->data;
-			temp->next->data = cp;
-		}
+	for (i = 0; i < stack_len(head); i++) {
+		for (temp = head; temp && temp->next; temp = temp->next) {
+			person* blah = (person *) temp->data;
+			person * blahNext = (person *) temp->next->data;
+			if (strcmp(blah->name, blahNext->name) > 0) {
+				/* no need for a whole node, since you only copy a pointer */
+				person *cp;
+				cp = temp->data;
+				temp->data = temp->next->data;
+				temp->next->data = cp;
+			}
 
+		}
 	}
 
 }
