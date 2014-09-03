@@ -1,10 +1,10 @@
 all: logappend logread
 
 logread:
-	gcc -g -ggdb -lssl -lcrypto logReadSrc/* -o build/logread
+	gcc -O3 logReadSrc/* -o build/logread -lssl -lcrypto
 
 logappend:
-	gcc -g -ggdb -lssl -lcrypto logAppendSrc/* -o build/logappend
+	gcc -O3 logAppendSrc/* -o build/logappend -lssl -lcrypto
 
 clean:
 	rm build/*
