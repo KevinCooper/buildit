@@ -23,7 +23,7 @@ void whyIsTheHTMLFormatDifferent_S(logread_args* args);
 HT* allMahHashes;
 Node *peopleHead;
 int32_t highestRoomNum;
-
+//
 int main(int argc, char * argv[]) {
 	peopleHead = NULL;
 	allMahHashes = ht_create(65536);
