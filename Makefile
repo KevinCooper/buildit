@@ -5,3 +5,6 @@ logread:
 
 logappend:
 	gcc -g -ggdb -lssl -lcrypto logAppendSrc/* -o build/logappend
+
+clean:
+	rm build/*
