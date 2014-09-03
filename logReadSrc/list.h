@@ -21,6 +21,7 @@ struct stack //stack structure format
 };
 
 int stack_len(Node *node_head); //stack length
+void reverse(Node** head_ref);
 void stack_push(Node **node_head, stack_data d); //pushes a value d onto the stack
 stack_data stack_pop(Node **node_head); //removes the head from the stack & returns its value
 void stack_print(Node **node_head); //prints all the stack data

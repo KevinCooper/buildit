@@ -18,7 +18,6 @@
 void buildDataStructs(logappend_args *temp);
 void doBadThings(logread_args* args);
 void sortLinkedList_Names(Node *head);
-void sortLinkedList_Rooms(Node *head);
 void whyIsTheHTMLFormatDifferent_S(logread_args* args);
 
 HT* allMahHashes;
@@ -164,7 +163,7 @@ void doBadThings(logread_args* args) {
 			blahzz = ht_get(allMahHashes, args->guestName);
 		}
 		Node* temp = blahzz->rooms;
-		sortLinkedList_Rooms(temp);
+		reverse(&temp);
 		uint32_t isFirst = 1;
 		if (args->inHTML)
 			init_R();
@@ -183,8 +182,8 @@ void doBadThings(logread_args* args) {
 		if (args->inHTML)
 			printFooter();
 	}
-	printf("\n");
-	fflush(stdout);
+	//printf("\n");
+	//fflush(stdout);
 
 }
 
@@ -256,27 +255,6 @@ void sortLinkedList_Names(Node *head) {
 			person* blah = (person *) temp->data;
 			person * blahNext = (person *) temp->next->data;
 			if (strcmp(blah->name, blahNext->name) > 0) {
-				/* no need for a whole node, since you only copy a pointer */
-				person *cp;
-				cp = temp->data;
-				temp->data = temp->next->data;
-				temp->next->data = cp;
-			}
-
-		}
-	}
-
-}
-
-void sortLinkedList_Rooms(Node *head) {
-	Node *temp;
-	int i;
-	/* since the compare dereferences temp->next you'll have to verify that it is not NULL */
-	for (i = 0; i < stack_len(head); i++) {
-		for (temp = head; temp && temp->next; temp = temp->next) {
-			uint32_t room1 = *((uint32_t *)temp->data);
-			uint32_t room2 = *((uint32_t *)temp->next->data);
-			if (room2 > room1) {
 				/* no need for a whole node, since you only copy a pointer */
 				person *cp;
 				cp = temp->data;

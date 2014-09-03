@@ -14,6 +14,23 @@ int stack_len(Node *node_head)
     return len;
 }
 
+/* Function to reverse the linked list */
+void reverse(Node** head_ref)
+{
+	Node* prev   = NULL;
+	Node* current = *head_ref;
+	Node* next;
+    while (current != NULL)
+    {
+        next  = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    *head_ref = prev;
+}
+
+
 //pushes a value d onto the stack
 void stack_push(Node **node_head, stack_data d)
 {
