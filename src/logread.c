@@ -18,6 +18,7 @@
 void buildDataStructs(logappend_args *temp);
 void doBadThings(logread_args* args);
 void sortLinkedList(Node *head);
+void whyIsTheHTMLFormatDifferent_S(logread_args* args);
 
 HT* allMahHashes;
 Node *peopleHead;
@@ -78,11 +79,7 @@ void buildDataStructs(logappend_args *temp) {
 		currPerson->rooms = NULL;
 		strcpy(currPerson->name, name);
 		currPerson->isEmployee = isemployee;
-		//if (temp->roomID != -1) {
-		//	currPerson->roomID = temp->roomID;
-		//} else {
 		currPerson->roomID = -1;
-		//}
 		currPerson->enterTime = temp->timestamp;
 		ht_put(allMahHashes, currPerson->name, currPerson);
 		stack_push(&peopleHead, currPerson);
@@ -106,6 +103,10 @@ void doBadThings(logread_args* args) {
 	int32_t currRoom;
 	uint32_t isFirst = 1;
 	if (args->currentState) {
+		if (args->inHTML) {
+			whyIsTheHTMLFormatDifferent_S(args);
+			return;
+		}
 		Node* temp = peopleHead;
 		while (temp) {
 			person* tempP = (person *) (temp->data);
@@ -178,6 +179,63 @@ void doBadThings(logread_args* args) {
 	}
 	printf("\n");
 	fflush(stdout);
+
+}
+
+void columns(Node* temp_E, Node* temp_G) {
+	person* tempE = temp_E == NULL ? NULL : (person *) (temp_E->data);
+	person* tempG = temp_G == NULL ? NULL : (person *) (temp_G->data);
+	if (!temp_E && !temp_G) {
+		return;
+	} else if (temp_E && !tempE->isEmployee) {
+		columns(temp_E->next, temp_G);
+	} else if (temp_G && tempG->isEmployee) {
+		columns(temp_E, temp_G->next);
+	} else if (temp_E == NULL && temp_G && !tempG->isEmployee) {
+		printGallery(tempE, tempG);
+		if (temp_G->next != NULL)
+			printEndTableNewTable();
+		printEndTableNewTable();
+		columns(temp_E, temp_G->next);
+	} else if (temp_G == NULL && temp_E && tempE->isEmployee) {
+		printGallery(tempE, tempG);
+		if (temp_E->next != NULL)
+			printEndTableNewTable();
+		columns(temp_E->next, temp_G);
+	} else {
+		printGallery(tempE, tempG);
+		if (temp_E->next != NULL && temp_G->next != NULL)
+			printEndTableNewTable();
+		columns(temp_E->next, temp_G->next);
+	}
+}
+
+void whyIsTheHTMLFormatDifferent_S(logread_args* args) {
+	Node* temp_E = peopleHead;
+	Node* temp_G = peopleHead;
+	columns(temp_E, temp_G);
+	uint32_t currRoom;
+	printSetup_S_2();
+	uint32_t isFirst;
+	for (currRoom = 0; currRoom <= highestRoomNum; currRoom++) {
+		isFirst = 1;
+		Node* temp = peopleHead;
+		printf("<tr>\n\t<td>%d</td>\n\t<td>", currRoom);
+		while (temp) {
+			person* tempP = (person *) (temp->data);
+			if (tempP->roomID == currRoom) {
+				if (!isFirst)
+					printf(",");
+				isFirst = 0;
+				printf("%s", tempP->name);
+
+			}
+			temp = temp->next;
+		}
+		printf("</td>\n</tr>\n");
+	}
+
+	printFooter();
 
 }
 
