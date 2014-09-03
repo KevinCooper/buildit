@@ -1,1 +1,0 @@
-gcc -g -ggdb -lssl -lcrypto args.c args.h args_log.c args_log.h argv.c argv.h color.h dbg.h definitions.h functions.c functions.h hash.c hash.h list.c list.h logread.c dictionary.c dictionary.h htmlPrint.c htmlPrint.h -o logread
