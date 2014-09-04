@@ -24,7 +24,7 @@ void print_R_element(int32_t * element){
 	printf("<tr>\n<th>%d</th>\n</tr>\n", *element);
 }
 void print_AB_element(char * element){
-	printf("<tr>\n<th>%s</th>\n</tr>\n", element);
+	printf("<tr>\n<td>%s</td>\n</tr>\n", element);
 }
 void printSetup_S_2(){
 	printf("<table>\n<tr>\n\t<th>Room ID</th>\n\t<th>Occupants</th>\n</tr>\n");

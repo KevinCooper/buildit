@@ -203,8 +203,10 @@ void doBadThings(logread_args* args) {
 
 	} else if (args->bounds->upper > args->bounds->lower) {
 		Node* temp = peopleHead;
-		if (args->inHTML)
+		if (args->inHTML) {
 			printHeader();
+			printf("<tr>\n<th>Employees</th>\n</tr>\n");
+		}
 		while (temp) {
 			person* tempP = (person *) (temp->data);
 			if (tempP->isEmployee
