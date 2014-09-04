@@ -201,7 +201,8 @@ void doBadThings(logread_args* args) {
 			printf("%d", timespent);
 		}
 
-	} else if (args->bounds->upper > args->bounds->lower) {
+	} else if (args->listEmployeesWithTime
+			&& args->bounds->upper > args->bounds->lower) {
 		Node* temp = peopleHead;
 		if (args->inHTML) {
 			printHeader();
@@ -213,6 +214,41 @@ void doBadThings(logread_args* args) {
 					&& (tempP->enterTime <= args->bounds->upper
 							&& (tempP->leaveTime >= args->bounds->lower
 									|| tempP->leaveTime == -1))) {
+				if (!isFirst && !args->inHTML) {
+					printf(",");
+				}
+
+				isFirst = 0;
+				if (!args->inHTML) {
+					printf("%s", tempP->name);
+				} else {
+					print_AB_element(tempP->name);
+				}
+
+			}
+			temp = temp->next;
+
+		}
+		if (args->inHTML)
+			printFooter();
+	} else if (args->listEmployeesWithoutTime
+			&& args->bounds->upper > args->bounds->lower
+			&& args->bounds->upper1 > args->bounds->lower1) {
+		Node* temp = peopleHead;
+		if (args->inHTML) {
+			printHeader();
+			printf("<tr>\n<th>Employees</th>\n</tr>\n");
+		}
+		while (temp) {
+			person* tempP = (person *) (temp->data);
+			if (tempP->isEmployee
+					&& (tempP->enterTime <= args->bounds->upper
+							&& (tempP->leaveTime >= args->bounds->lower
+									|| tempP->leaveTime == -1))
+					&& ((tempP->enterTime > args->bounds->upper1
+							&& tempP->leaveTime > args->bounds->upper1)
+							|| (tempP->leaveTime < args->bounds->lower1
+									&& tempP->enterTime < args->bounds->lower1))) {
 				if (!isFirst && !args->inHTML) {
 					printf(",");
 				}

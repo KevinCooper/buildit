@@ -33,14 +33,13 @@ logread_args opt_parser(int32_t argc, char **argv) {
 	args.bounds->lower1 = 0;
 	args.bounds->upper1 = 0;
 
-
 	opterr = 0;
 	int32_t len = 0;
 	optind = 0;  //This must occur to have getopt back in its correct state!
 
 //TODO: Check for invalid inputs (Token Flag with no opt, will give ":" )
 
-	while ((c = getopt(argc, argv, "K:HSRTAIL:U:E:G:")) != -1) {
+	while ((c = getopt(argc, argv, "K:BHSRTAIL:U:E:G:")) != -1) {
 		switch (c) {
 		case 'H':
 			args.inHTML = 1;
@@ -81,10 +80,20 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			strcpy(args.guestName, optarg);
 			break;
 		case 'L':
-			args.bounds->lower = atoi(optarg);
+			if (args.listEmployeesWithoutTime
+					&& args.bounds->upper > args.bounds->lower) {
+				args.bounds->lower1 = atoi(optarg);
+			} else {
+				args.bounds->lower = atoi(optarg);
+			}
 			break;
 		case 'U':
-			args.bounds->upper = atoi(optarg);
+			if (args.listEmployeesWithoutTime
+					&& args.bounds->upper > args.bounds->lower) {
+				args.bounds->upper1 = atoi(optarg);
+			} else {
+				args.bounds->upper = atoi(optarg);
+			}
 			break;
 		case '?':
 			if (optopt == 'c')
@@ -103,8 +112,9 @@ logread_args opt_parser(int32_t argc, char **argv) {
 	if (index < argc) {
 		args.logName = argv[index];
 	}
-	int32_t exclusive_options = args.currentState + args.listAllRooms_R + args.totalTime + args.printSpecificRooms_I + args.listEmployeesWithTime
-			+ args.listEmployeesWithoutTime;
+	int32_t exclusive_options = args.currentState + args.listAllRooms_R
+			+ args.totalTime + args.printSpecificRooms_I
+			+ args.listEmployeesWithTime + args.listEmployeesWithoutTime;
 	if (exclusive_options > 1 || exclusive_options < 1)
 		invalid();
 
