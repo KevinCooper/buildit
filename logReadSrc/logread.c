@@ -23,6 +23,7 @@ void whyIsTheHTMLFormatDifferent_S(logread_args* args);
 HT* allMahHashes;
 Node *peopleHead;
 int32_t highestRoomNum;
+int32_t lastTime;
 //
 int main(int argc, char * argv[]) {
 	peopleHead = NULL;
@@ -97,6 +98,7 @@ void buildDataStructs(logappend_args *temp) {
 	} else {
 		currPerson->roomID = -1;
 	}
+	lastTime = temp->timestamp;
 
 }
 
@@ -181,9 +183,26 @@ void doBadThings(logread_args* args) {
 		}
 		if (args->inHTML)
 			printFooter();
+	} else if (args->totalTime) {
+		person* blahzz;
+		if (args->employeeName != NULL) {
+			blahzz = ht_get(allMahHashes, args->employeeName);
+		} else {
+			blahzz = ht_get(allMahHashes, args->guestName);
+		}
+		if (blahzz != NULL) {
+			int32_t timespent;
+			if (blahzz->leaveTime == -1) {
+				timespent = lastTime - blahzz->enterTime;
+			} else {
+				timespent = blahzz->leaveTime - blahzz->enterTime;
+			}
+			printf("%d", timespent);
+		}
+
 	}
 	//printf("\n");
-	//fflush(stdout);
+	fflush(stdout);
 
 }
 
