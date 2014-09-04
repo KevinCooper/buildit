@@ -16,17 +16,24 @@
 
 
 typedef struct Person {
-	char name[256];
 	uint32_t isEmployee;
 	int32_t roomID;
 	uint32_t enterTime;
-	uint32_t leaveTime;
+	int32_t leaveTime;
 	uint32_t inBuilding;
 	Node * rooms;
+	char name[256];
+
 } person;
 
+typedef struct{
+	uint32_t lower;
+	uint32_t upper;
+	uint32_t lower1;
+	uint32_t upper1;
+}times;
+
 typedef struct {
-	char * token;
 	uint32_t inHTML;
 	uint32_t currentState;
 	uint32_t totalTime;
@@ -34,10 +41,10 @@ typedef struct {
 	uint32_t printSpecificRooms_I;
 	uint32_t listEmployeesWithTime;
 	uint32_t listEmployeesWithoutTime;
+	times * bounds;
+	char * token;
 	char * employeeName;
 	char * guestName;
-	int32_t lowerBound;
-	int32_t upperBound;
 	char * logName;
 
 } logread_args;

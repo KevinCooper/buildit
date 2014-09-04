@@ -82,6 +82,7 @@ void buildDataStructs(logappend_args *temp) {
 		currPerson->isEmployee = isemployee;
 		currPerson->roomID = -1;
 		currPerson->inBuilding = 1;
+		currPerson->leaveTime = -1;
 		currPerson->enterTime = temp->timestamp;
 		ht_put(allMahHashes, currPerson->name, currPerson);
 		stack_push(&peopleHead, currPerson);
@@ -200,8 +201,34 @@ void doBadThings(logread_args* args) {
 			printf("%d", timespent);
 		}
 
+	} else if (args->bounds->upper > args->bounds->lower) {
+		Node* temp = peopleHead;
+		if (args->inHTML)
+			printHeader();
+		while (temp) {
+			person* tempP = (person *) (temp->data);
+			if (tempP->isEmployee
+					&& (tempP->enterTime <= args->bounds->upper
+							&& (tempP->leaveTime >= args->bounds->lower
+									|| tempP->leaveTime == -1))) {
+				if (!isFirst && !args->inHTML) {
+					printf(",");
+				}
+
+				isFirst = 0;
+				if (!args->inHTML) {
+					printf("%s", tempP->name);
+				} else {
+					print_AB_element(tempP->name);
+				}
+
+			}
+			temp = temp->next;
+
+		}
+		if (args->inHTML)
+			printFooter();
 	}
-	//printf("\n");
 	fflush(stdout);
 
 }

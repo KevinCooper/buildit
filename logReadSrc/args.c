@@ -27,8 +27,12 @@ logread_args opt_parser(int32_t argc, char **argv) {
 	args.printSpecificRooms_I = 0;
 	args.listEmployeesWithTime = 0;
 	args.listEmployeesWithoutTime = 0;
-	args.lowerBound = -1;
-	args.upperBound = -1;
+	args.bounds = malloc(sizeof(times));
+	args.bounds->lower = 0;
+	args.bounds->upper = 0;
+	args.bounds->lower1 = 0;
+	args.bounds->upper1 = 0;
+
 
 	opterr = 0;
 	int32_t len = 0;
@@ -77,10 +81,10 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			strcpy(args.guestName, optarg);
 			break;
 		case 'L':
-			args.lowerBound = atoi(optarg);
+			args.bounds->lower = atoi(optarg);
 			break;
 		case 'U':
-			args.upperBound = atoi(optarg);
+			args.bounds->upper = atoi(optarg);
 			break;
 		case '?':
 			if (optopt == 'c')
