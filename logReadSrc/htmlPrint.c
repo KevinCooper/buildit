@@ -23,6 +23,9 @@ void init_R(){
 void print_R_element(int32_t * element){
 	printf("<tr>\n<th>%d</th>\n</tr>\n", *element);
 }
+void print_I_element(int32_t * element){
+	printf("<tr>\n<td>%d</td>\n</tr>\n", *element);
+}
 void print_AB_element(char * element){
 	printf("<tr>\n<td>%s</td>\n</tr>\n", element);
 }

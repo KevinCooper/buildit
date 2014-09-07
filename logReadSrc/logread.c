@@ -19,6 +19,7 @@ void buildDataStructs(logappend_args *temp);
 void doBadThings(logread_args* args);
 void sortLinkedList_Names(Node *head);
 void whyIsTheHTMLFormatDifferent_S(logread_args* args);
+void sortLinkedList_Nums(Node *head);
 
 HT* allMahHashes;
 Node *peopleHead;
@@ -266,6 +267,60 @@ void doBadThings(logread_args* args) {
 		}
 		if (args->inHTML)
 			printFooter();
+	} else if (args->printSpecificRooms_I) {
+		Node * temp = args->peoples_I;
+		Node * roomList = NULL;
+		Node * oldList = NULL;
+		while (temp) {
+			char * personName = (char *) temp->data;
+			person* currPerson = ht_get(allMahHashes, personName);
+			if (currPerson == NULL)
+				invalid();
+			if (isFirst) {
+				roomList = currPerson->rooms;
+				sortLinkedList_Nums(roomList);
+			} else {
+				oldList = roomList;
+				roomList = NULL;
+				while (oldList && currPerson->rooms) {
+					int32_t * tempAA = oldList->data;
+					int32_t * tempBB = currPerson->rooms->data;
+					if (*tempAA == *tempBB) {
+						int32_t * tempNum = malloc(sizeof(int32_t));
+						*tempNum = *tempAA;
+						stack_push(&roomList, tempNum);
+						oldList = oldList->next;
+						currPerson->rooms = currPerson->rooms->next;
+					} else if (*tempAA < *tempBB) {
+						oldList = oldList->next;
+					} else {
+						currPerson->rooms = currPerson->rooms->next;
+					}
+				}
+			}
+			temp = temp->next;
+		}
+		isFirst = 1;
+		if (args->inHTML) {
+			printHeader();
+			printf("<tr>\n<th>Rooms</th>\n</tr>\n");
+		}
+		while (roomList) {
+
+			if (!isFirst && !args->inHTML)
+				printf(",");
+			int32_t * tempNum = roomList->data;
+			if (!args->inHTML) {
+				printf("%d", *tempNum);
+			} else {
+				print_I_element(tempNum);
+			}
+
+			isFirst = 0;
+			roomList = roomList->next;
+		}
+		if (args->inHTML)
+			printFooter();
 	}
 	fflush(stdout);
 
@@ -341,6 +396,27 @@ void sortLinkedList_Names(Node *head) {
 			if (strcmp(blah->name, blahNext->name) > 0) {
 				/* no need for a whole node, since you only copy a pointer */
 				person *cp;
+				cp = temp->data;
+				temp->data = temp->next->data;
+				temp->next->data = cp;
+			}
+
+		}
+	}
+
+}
+
+void sortLinkedList_Nums(Node *head) {
+	Node *temp;
+	int i;
+	/* since the compare dereferences temp->next you'll have to verify that it is not NULL */
+	for (i = 0; i < stack_len(head); i++) {
+		for (temp = head; temp && temp->next; temp = temp->next) {
+			int32_t* blah = (int32_t *) temp->data;
+			int32_t * blahNext = (int32_t *) temp->next->data;
+			if (*blah > *blahNext) {
+				/* no need for a whole node, since you only copy a pointer */
+				int32_t *cp;
 				cp = temp->data;
 				temp->data = temp->next->data;
 				temp->next->data = cp;

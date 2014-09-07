@@ -46,6 +46,7 @@ typedef struct {
 	char * employeeName;
 	char * guestName;
 	char * logName;
+	Node * peoples_I;
 
 } logread_args;
 

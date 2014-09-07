@@ -20,5 +20,6 @@ void init_R();
 void print_R_element(int32_t * element);
 void print_AB_element(char * element);
 void printSetup_S_2();
+void print_I_element(int32_t * element);
 
 #endif /* HTMLPRINT_H_ */

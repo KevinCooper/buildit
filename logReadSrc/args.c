@@ -32,7 +32,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 	args.bounds->upper = 0;
 	args.bounds->lower1 = 0;
 	args.bounds->upper1 = 0;
-
+	args.peoples_I = NULL;
 	opterr = 0;
 	int32_t len = 0;
 	optind = 0;  //This must occur to have getopt back in its correct state!
@@ -63,21 +63,31 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			args.listEmployeesWithoutTime = 1;
 			break;
 		case 'K':
-			//TODO: Verify that token is alphanumeric
 			len = strlen(optarg);
 			args.token = (char *) malloc(len + 1);
 			strcpy(args.token, optarg);
 			break;
 		case 'E':
-			//TODO: verify that name is upper/lowercase letters.  No spaces.
 			len = strlen(optarg);
-			args.employeeName = (char *) malloc(len + 1);
-			strcpy(args.employeeName, optarg);
+			if (args.printSpecificRooms_I) {
+				char * person = (char *) malloc(len + 1);
+				strcpy(person, optarg);
+				stack_push(&args.peoples_I, person);
+			} else {
+				args.employeeName = (char *) malloc(len + 1);
+				strcpy(args.employeeName, optarg);
+			}
 			break;
 		case 'G':
 			len = strlen(optarg);
-			args.guestName = (char *) malloc(len + 1);
-			strcpy(args.guestName, optarg);
+			if (args.printSpecificRooms_I) {
+				char * person = (char *) malloc(len + 1);
+				strcpy(person, optarg);
+				stack_push(&args.peoples_I, person);
+			} else {
+				args.guestName = (char *) malloc(len + 1);
+				strcpy(args.guestName, optarg);
+			}
 			break;
 		case 'L':
 			if (args.listEmployeesWithoutTime
