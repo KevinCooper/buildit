@@ -27,6 +27,7 @@ int32_t highestRoomNum;
 int32_t lastTime;
 //
 int main(int argc, char * argv[]) {
+	volatile int blah;
 	peopleHead = NULL;
 	allMahHashes = ht_create(65536);
 	int32_t fileSize = 0;
