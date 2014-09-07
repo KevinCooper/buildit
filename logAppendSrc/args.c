@@ -78,6 +78,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 				debug("Unknown option `-%c'.\n", optopt);
 			else
 				debug("Unknown option character `\\x%x'.\n", optopt);
+			invalid();
 			break;
 		default:
 			invalid();
