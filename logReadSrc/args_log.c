@@ -86,9 +86,9 @@ logappend_args opt_parser_log(int32_t argc, char **argv) {
 	}
 
 	index = optind;
-	if (index < argc) {
-		args.logName = argv[index];
-	}
+	//if (index < argc) {
+	//	args.logName = argv[index];
+	//}
 	//debug(
 	//		"\nTimestamp: %d\nToken: %s\nEmployee: %s\nGuest: %s\nArrival: %d\nDeparture: %d\nRoomID: %d\nLogName: %s\nBatchName: %s",
 	//		args.timestamp, args.token, args.employeeName, args.guestName,
@@ -140,11 +140,6 @@ void * toString(logappend_args* args) {
 			strcat(string, " -R ");
 			sprintf(str, "%d", args->roomID);
 			strcat(string, str);
-			strcat(string, " ");
-			strcat(string, args->logName);
-		} else {
-			strcat(string, " ");
-			strcat(string, args->logName);
 		}
 	}
 	strcat(string, "\n");

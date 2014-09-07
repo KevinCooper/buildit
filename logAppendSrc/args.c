@@ -139,11 +139,6 @@ void * toString(logappend_args* args) {
 			strcat(string, " -R ");
 			sprintf(str, "%d", args->roomID);
 			strcat(string, str);
-			strcat(string, " ");
-			strcat(string, args->logName);
-		} else {
-			strcat(string, " ");
-			strcat(string, args->logName);
 		}
 	}
 	strcat(string, "\n");
