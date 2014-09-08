@@ -38,7 +38,7 @@ int main(int argc, char * argv[]) {
 	oldHashExists = 1;
 	oldTime = -1;
 	firstRun = 1;
-	logappend_args args = opt_parser(argc, argv);
+	logappend_args args = opt_parser(argc, argv, 1);
 	allMahHashes_employees = ht_create(65536);
 	allMahHashes_guests = ht_create(65536);
 
@@ -87,7 +87,7 @@ void inter(logappend_args args) {
 		sprintf(interString, "./logappend %s", line);
 		int tempc;
 		char ** tempv = argv_split(interString, &tempc);
-		logappend_args temp = opt_parser(tempc, tempv);
+		logappend_args temp = opt_parser(tempc, tempv, 0);
 		if (check_logic(&temp) == -1)
 			continue;
 		argv_free(tempv);
@@ -117,7 +117,7 @@ void batch(logappend_args args) {
 		sprintf(interString, "./logappend %s", line);
 		int tempc;
 		char ** tempv = argv_split(interString, &tempc);
-		logappend_args temp = opt_parser(tempc, tempv);
+		logappend_args temp = opt_parser(tempc, tempv, 1);
 		if (temp.batchFile)
 			continue;
 		if (check_logic(&temp) == -1)

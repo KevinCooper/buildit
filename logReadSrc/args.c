@@ -9,7 +9,7 @@
 #include "definitions.h"
 #include "functions.h"
 
-logread_args opt_parser(int32_t argc, char **argv) {
+logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 	int32_t index;
 	int32_t c;
 	logread_args args;
@@ -61,13 +61,15 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			break;
 		case 'K':
 			len = MIN(strlen(optarg), MAX_ONE);
-			nameOpt(optarg);
+			if (checkInput)
+				nameOpt(optarg);
 			args.token = (char *) calloc(MAX, 1);
 			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
 			len = MIN(strlen(optarg), MAX_ONE);
-			nameOpt(optarg);
+			if (checkInput)
+				nameOpt(optarg);
 			if (args.printSpecificRooms_I) {
 				char * person = (char *) calloc(MAX, 1);
 				strncpy(person, optarg, len);
@@ -79,7 +81,8 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			break;
 		case 'G':
 			len = MIN(strlen(optarg), MAX_ONE);
-			nameOpt(optarg);
+			if (checkInput)
+				nameOpt(optarg);
 			if (args.printSpecificRooms_I) {
 				char * person = (char *) calloc(MAX, 1);
 				strncpy(person, optarg, len);
@@ -90,7 +93,8 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			}
 			break;
 		case 'L':
-			numOpt(optarg);
+			if (checkInput)
+				numOpt(optarg);
 			if (args.listEmployeesWithoutTime
 					&& args.bounds->upper > args.bounds->lower) {
 				args.bounds->lower1 = atoi(optarg);
@@ -99,7 +103,8 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			}
 			break;
 		case 'U':
-			numOpt(optarg);
+			if (checkInput)
+				numOpt(optarg);
 			if (args.listEmployeesWithoutTime
 					&& args.bounds->upper > args.bounds->lower) {
 				args.bounds->upper1 = atoi(optarg);

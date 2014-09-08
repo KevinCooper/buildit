@@ -39,7 +39,7 @@ int main(int argc, char * argv[]) {
 	char interString[256];
 
 	//get Logreader arguements
-	logread_args args = opt_parser(argc, argv);
+	logread_args args = opt_parser(argc, argv, 1);
 	//Verify integrity and hopefully the syntax should be right
 	checkMahFile(args);
 

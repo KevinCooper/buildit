@@ -9,7 +9,7 @@
 #include "functions.h"
 #include "definitions.h"
 
-logappend_args opt_parser(int32_t argc, char **argv) {
+logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 	int32_t index;
 	int32_t c;
 	logappend_args args;
@@ -33,30 +33,36 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 		//debug("%c", c);
 		switch (c) {
 		case 'T':
-			numOpt(optarg);
+			if (checkInput)
+				numOpt(optarg);
 			args.timestamp = atoi(optarg);
 			break;
+		case 'B':
 			len = MIN(strlen(optarg), MAX_ONE);
 			args.batchFile = (char *) calloc(MAX, 1);
-			nameOpt(optarg);
+			if (checkInput)
+				nameOpt(optarg);
 			strncpy(args.batchFile, optarg, len);
 			break;
 		case 'K':
 			len = MIN(strlen(optarg), MAX_ONE);
 			args.token = (char *) calloc(MAX, 1);
-			nameOpt(optarg);
+			if (checkInput)
+				nameOpt(optarg);
 			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
 			len = MIN(strlen(optarg), MAX_ONE);
 			args.employeeName = (char *) calloc(MAX, 1);
-			nameOpt(optarg);
+			if (checkInput)
+				nameOpt(optarg);
 			strncpy(args.employeeName, optarg, len);
 			break;
 		case 'G':
 			len = MIN(strlen(optarg), MAX_ONE);
 			args.guestName = (char *) calloc(MAX, 1);
-			nameOpt(optarg);
+			if (checkInput)
+				nameOpt(optarg);
 			strncpy(args.guestName, optarg, len);
 			break;
 		case 'A':
@@ -66,6 +72,7 @@ logappend_args opt_parser(int32_t argc, char **argv) {
 			args.eventDeparture = 1;
 			break;
 		case 'R':
+			if(checkInput)
 			numOpt(optarg);
 			args.roomID = atoi(optarg);
 			break;
