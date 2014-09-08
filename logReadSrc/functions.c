@@ -151,14 +151,19 @@ void checkMahFile(logread_args args) {
 		printf("Couldn't initialize AES cipher\n");
 		invalid();
 	}
-	char* oldMD5_de_S = (char *) aes_decrypt(&de, oldMD5, &md5len);
+	char* oldMD5_de_S = aes_decrypt(&de, oldMD5, &md5len);
 
 	if (memcmp(oldMD5_de_S, currentMD5_S, MD5_DIGEST_LENGTH)) {
-		invalid();
+		invalid_token();
 	}
 
 	fclose(mahFile);
 	return;
+}
+
+void invalid_token() {
+	fprintf(stderr, "security error\n");
+		exit(-1);
 }
 
 

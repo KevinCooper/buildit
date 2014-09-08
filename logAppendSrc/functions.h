@@ -32,7 +32,7 @@ unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len
 unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len);
 void invalid();
 void printMD5(char * toPrint);
-
+void invalid_token();
 void nameOpt(char * input);
 
 void numOpt(char * input);

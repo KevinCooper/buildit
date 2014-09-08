@@ -217,7 +217,7 @@ void checkMahFile(logappend_args args) {
 	char* oldMD5_de_S = (char *) aes_decrypt(&de, oldMD5, &md5len);
 
 	if (memcmp(oldMD5_de_S, currentMD5_S, MD5_DIGEST_LENGTH)) {
-		invalid();
+		invalid_token();
 	}
 
 	fclose(mahFile);

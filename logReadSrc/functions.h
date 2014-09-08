@@ -27,7 +27,7 @@ void invalid();
 void checkMahFile(logread_args args);
 void invalid_0();
 void nameOpt(char * input);
-
+void invalid_token();
 void numOpt(char * input);
 
 #endif /* FUNCTIONS_H_ */

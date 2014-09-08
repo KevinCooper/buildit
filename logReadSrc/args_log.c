@@ -39,25 +39,25 @@ logappend_args opt_parser_log(int32_t argc, char **argv) {
 			break;
 		case 'B':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.batchFile = (char *) calloc(MAX, 1);
+			args.batchFile = calloc(MAX, 1);
 			nameOpt(optarg);
 			strncpy(args.batchFile, optarg, len);
 			break;
 		case 'K':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.token = (char *) calloc(MAX, 1);
+			args.token =  calloc(MAX, 1);
 			//nameOpt(optarg);
 			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.employeeName = (char *) calloc(MAX, 1);
+			args.employeeName =  calloc(MAX, 1);
 			//nameOpt(optarg);
 			strncpy(args.employeeName, optarg, len);
 			break;
 		case 'G':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.guestName = (char *) calloc(MAX, 1);
+			args.guestName =  calloc(MAX, 1);
 			//nameOpt(optarg);
 			strncpy(args.guestName, optarg, len);
 			break;

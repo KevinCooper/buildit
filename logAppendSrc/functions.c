@@ -53,9 +53,9 @@ int check_logic(logappend_args * args) {
 		newUser->inBuilding = 0;
 		newUser->inRoom = 0;
 		newUser->roomID = 0;
-		if(args->employeeName != NULL){
+		if (args->employeeName != NULL) {
 			ht_put(allMahHashes_employees, newUser->name, newUser);
-		}else{
+		} else {
 			ht_put(allMahHashes_guests, newUser->name, newUser);
 		}
 	}
@@ -106,7 +106,8 @@ int check_logic(logappend_args * args) {
  * Create an 256 bit key and IV using the supplied key_data. salt can be added for taste.
  * Fills in the encryption and decryption ctx objects and returns 0 on success
  **/
-int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *e_ctx, EVP_CIPHER_CTX *d_ctx) {
+int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt,
+		EVP_CIPHER_CTX *e_ctx, EVP_CIPHER_CTX *d_ctx) {
 	int i, nrounds = 5;
 	unsigned char key[32], iv[32];
 
@@ -115,7 +116,8 @@ int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP
 	 * nrounds is the number of times the we hash the material. More rounds are more secure but
 	 * slower.
 	 */
-	i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data, key_data_len, nrounds, key, iv);
+	i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data,
+			key_data_len, nrounds, key, iv);
 	if (i != 32) {
 		printf("Key size is %d bits - should be 256 bits\n", i);
 		return -1;
@@ -133,7 +135,8 @@ int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP
  * Encrypt *len bytes of data
  * All data going in & out is considered binary (unsigned char[])
  */
-unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len) {
+unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext,
+		int *len) {
 	/* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
 	int c_len = *len + AES_BLOCK_SIZE;
 	int f_len = 0;
@@ -156,7 +159,8 @@ unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len
 /*
  * Decrypt *len bytes of ciphertext
  */
-unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len) {
+unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext,
+		int *len) {
 	/* because we have padding ON, we must allocate an extra cipher block size of memory */
 	int p_len = *len, f_len = 0;
 	unsigned char *plaintext = malloc(p_len + AES_BLOCK_SIZE);
@@ -176,4 +180,8 @@ void invalid() {
 	} else {
 		exit(-1);
 	}
+}
+void invalid_token() {
+	fprintf(stderr, "security error\n");
+	exit(-1);
 }

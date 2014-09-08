@@ -39,26 +39,26 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 			break;
 		case 'B':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.batchFile = (char *) calloc(MAX, 1);
+			args.batchFile = calloc(MAX, 1);
 			strncpy(args.batchFile, optarg, len);
 			break;
 		case 'K':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.token = (char *) calloc(MAX, 1);
+			args.token =  calloc(MAX, 1);
 			if (checkInput)
 				nameOpt(optarg);
 			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.employeeName = (char *) calloc(MAX, 1);
+			args.employeeName = calloc(MAX, 1);
 			if (checkInput)
 				nameOpt(optarg);
 			strncpy(args.employeeName, optarg, len);
 			break;
 		case 'G':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.guestName = (char *) calloc(MAX, 1);
+			args.guestName = calloc(MAX, 1);
 			if (checkInput)
 				nameOpt(optarg);
 			strncpy(args.guestName, optarg, len);
@@ -115,7 +115,7 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 
 //FIXME: Maybe strings larger than 256?
 void * toString(logappend_args* args) {
-	char * string = (char *) calloc(256, 1);
+	char * string =  calloc(256, 1);
 	char str[15];
 	if (args->batchFile != NULL) {
 		sprintf(string, "-B %s ", args->batchFile);
