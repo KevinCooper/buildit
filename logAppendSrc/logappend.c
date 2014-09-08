@@ -122,13 +122,14 @@ void batch(logappend_args args) {
 		logappend_args temp = opt_parser(tempc, tempv, 1);
 		if (temp.batchFile)
 			continue;
-		if (check_logic(&temp) == -1)
-			continue;
 		if (firstRun) {
 			checkMahFile(temp);
-			firstRun = 0;
+			inter(temp);
 		}
+		if (check_logic(&temp) == -1)
+			continue;
 		processLine(temp, fileSize < 10 ? 1 : 0);
+		firstRun = 0;
 		bzero(interString, 256);
 		argv_free(tempv);
 		// FINISH LOGICZ
@@ -167,7 +168,8 @@ void processLine(logappend_args args, int32_t isLastLine) {
 		MD5_Final(newMD5_S, &newMD5);
 		EVP_CIPHER_CTX en, de;
 		unsigned int salt[] = { 12345, 54321 };
-		if (aes_init(args.token, strlen(args.token), (unsigned char *) &salt, &en, &de)) {
+		if (aes_init(args.token, strlen(args.token), (unsigned char *) &salt,
+				&en, &de)) {
 			printf("Couldn't initialize AES cipher\n");
 			invalid();
 		}
@@ -213,7 +215,8 @@ void checkMahFile(logappend_args args) {
 	//Decrypt the old MD5
 	EVP_CIPHER_CTX en, de;
 	unsigned int salt[] = { 12345, 54321 };
-	if (aes_init(args.token, strlen(args.token), (unsigned char *) &salt, &en, &de)) {
+	if (aes_init(args.token, strlen(args.token), (unsigned char *) &salt, &en,
+			&de)) {
 		printf("Couldn't initialize AES cipher\n");
 		invalid();
 	}
