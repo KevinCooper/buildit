@@ -9,11 +9,6 @@
 #include "functions.h"
 #include "definitions.h"
 
-#define TRY do{ jmp_buf ex_buf__; if( !setjmp(ex_buf__) ){
-#define CATCH } else {
-#define ETRY } }while(0)
-#define THROW longjmp(ex_buf__, 1)
-
 logappend_args opt_parser_log(int32_t argc, char **argv) {
 	int32_t index;
 	int32_t c;
@@ -33,35 +28,38 @@ logappend_args opt_parser_log(int32_t argc, char **argv) {
 	optind = 0;  //This must occur to have getopt back in its correct state!
 
 //TODO: Check for invalid inputs (Token Flag with no opt, will give ":" )
+//No need to regex parse stored names/numbers since they would only have been stored if they were valid
 
 	while ((c = getopt(argc, argv, "T:B:K:E:G:ALR:")) != -1) {
 		//debug("%c", c);
 		switch (c) {
 		case 'T':
+			//numOpt(optarg);
 			args.timestamp = atoi(optarg);
 			break;
 		case 'B':
-			len = strlen(optarg);
-			args.batchFile = (char *) malloc(len + 1);
-			args.batchFile = strdup(optarg);
-			*(args.batchFile + len) = '\0';
+			len = MIN(strlen(optarg), MAX_ONE);
+			args.batchFile = (char *) calloc(MAX, 1);
+			nameOpt(optarg);
+			strncpy(args.batchFile, optarg, len);
 			break;
 		case 'K':
-			//TODO: Verify that token is alphanumeric
-			len = strlen(optarg);
-			args.token = (char *) malloc(len + 1);
-			strcpy(args.token, optarg);
+			len = MIN(strlen(optarg), MAX_ONE);
+			args.token = (char *) calloc(MAX, 1);
+			//nameOpt(optarg);
+			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
-			//TODO: verify that name is upper/lowercase letters.  No spaces.
-			len = strlen(optarg);
-			args.employeeName = (char *) malloc(len + 1);
-			strcpy(args.employeeName, optarg);
+			len = MIN(strlen(optarg), MAX_ONE);
+			args.employeeName = (char *) calloc(MAX, 1);
+			//nameOpt(optarg);
+			strncpy(args.employeeName, optarg, len);
 			break;
 		case 'G':
-			len = strlen(optarg);
-			args.guestName = (char *) malloc(len + 1);
-			strcpy(args.guestName, optarg);
+			len = MIN(strlen(optarg), MAX_ONE);
+			args.guestName = (char *) calloc(MAX, 1);
+			//nameOpt(optarg);
+			strncpy(args.guestName, optarg, len);
 			break;
 		case 'A':
 			args.eventArrival = 1;
@@ -70,15 +68,11 @@ logappend_args opt_parser_log(int32_t argc, char **argv) {
 			args.eventDeparture = 1;
 			break;
 		case 'R':
+			numOpt(optarg);
 			args.roomID = atoi(optarg);
 			break;
 		case '?':
-			if (optopt == 'c')
-				debug("Option -%c requires an argument.\n", optopt);
-			else if (isprint(optopt))
-				debug("Unknown option `-%c'.\n", optopt);
-			else
-				debug("Unknown option character `\\x%x'.\n", optopt);
+			invalid();
 			break;
 		default:
 			invalid();

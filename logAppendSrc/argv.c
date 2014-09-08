@@ -9,7 +9,7 @@ typedef int bool;
 #define true 1
 #define false 0
  
-static int count_argc(const char *str)
+int count_argc(const char *str)
 {
         int count = 0;
         bool was_space;

@@ -1,5 +1,23 @@
 #include "functions.h"
 
+void nameOpt(char * input) {
+	reti = regcomp(&regex, "[^a-zA-Z0-9]", 0);
+	reti = regexec(&regex, input, 0, NULL, 0);
+	if (!reti) {
+		invalid();
+	}
+	regfree(&regex);
+}
+
+void numOpt(char * input) {
+	reti = regcomp(&regex, "[^0-9]", 0);
+	reti = regexec(&regex, input, 0, NULL, 0);
+	if (!reti) {
+		invalid();
+	}
+	regfree(&regex);
+}
+
 void printMD5(char * toPrint) {
 	int i;
 	printf("0x");
@@ -88,9 +106,12 @@ unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *le
 void invalid() {
 	printf("invalid\n");
 	exit(-1);
-
 }
 
+void invalid_0(){
+	printf("invalid\n");
+	exit(0);
+}
 void checkMahFile(logread_args args) {
 	int32_t fileSize = 0;
 	FILE* mahFile = NULL;
@@ -103,7 +124,6 @@ void checkMahFile(logread_args args) {
 	char * line = NULL;
 	size_t bytes = 0;
 	ssize_t read;
-	int status = 0;
 
 	fileSize = fsize(pathname);
 	if (fileSize > 16) {
@@ -121,8 +141,8 @@ void checkMahFile(logread_args args) {
 	MD5_Final(currentMD5_S, &currentMD5);
 
 	//Read encrypted MD5 from the file
-	status = fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
-	status = fread(oldMD5, sizeof(unsigned char), MD5_DIGEST_LENGTH, mahFile);
+	fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
+	fread(oldMD5, sizeof(unsigned char), MD5_DIGEST_LENGTH, mahFile);
 
 	//Decrypt the old MD5
 	EVP_CIPHER_CTX en, de;

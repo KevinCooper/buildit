@@ -70,7 +70,6 @@ void inter(logappend_args args) {
 	ssize_t read = 0;
 	char * line = NULL;
 	char interString[256];
-	unsigned int md5len = MD5_DIGEST_LENGTH;
 
 	fileSize = fsize(args.logName);
 	if (fileSize < 16) {
@@ -187,7 +186,6 @@ void checkMahFile(logappend_args args) {
 	char * line = NULL;
 	size_t bytes = 0;
 	ssize_t read;
-	int status = 0;
 
 	fileSize = fsize(pathname);
 	if (fileSize > 16) {
@@ -206,8 +204,8 @@ void checkMahFile(logappend_args args) {
 	MD5_Final(currentMD5_S, &currentMD5);
 
 	//Read encrypted MD5 from the file
-	status = fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
-	status = fread(oldMD5, sizeof(unsigned char), MD5_DIGEST_LENGTH, mahFile);
+	fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
+	fread(oldMD5, sizeof(unsigned char), MD5_DIGEST_LENGTH, mahFile);
 
 	//Decrypt the old MD5
 	EVP_CIPHER_CTX en, de;

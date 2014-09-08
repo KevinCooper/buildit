@@ -10,6 +10,20 @@
 
 #include <unistd.h>
 #include <stdint.h>
+#include <regex.h>
+
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
+#define MAX 256
+#define MAX_ONE 255
+
+#define TRY do{ jmp_buf ex_buf__; if( !setjmp(ex_buf__) ){
+#define CATCH } else {
+#define ETRY } }while(0)
+#define THROW longjmp(ex_buf__, 1)
+
+regex_t regex;
+int reti;
 
 
 typedef struct

@@ -33,5 +33,9 @@ unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *le
 void invalid();
 void printMD5(char * toPrint);
 
+void nameOpt(char * input);
+
+void numOpt(char * input);
+
 
 #endif /* FUNCTIONS_H_ */

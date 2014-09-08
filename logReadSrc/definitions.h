@@ -11,8 +11,20 @@
 #include <stdint.h>
 #include "hash.h"
 #include "list.h"
+#include <regex.h>
 
-#define MAX 1024
+#define MAX 256
+#define MAX_ONE 255
+
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
+#define TRY do{ jmp_buf ex_buf__; if( !setjmp(ex_buf__) ){
+#define CATCH } else {
+#define ETRY } }while(0)
+#define THROW longjmp(ex_buf__, 1)
+
+regex_t regex;
+int reti;
 
 
 typedef struct Person {
@@ -22,7 +34,7 @@ typedef struct Person {
 	int32_t leaveTime;
 	uint32_t inBuilding;
 	Node * rooms;
-	char name[256];
+	char name[MAX];
 
 } person;
 

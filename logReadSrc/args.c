@@ -6,11 +6,8 @@
 #include <unistd.h>
 #include "dbg.h"
 #include "args.h"
-
-#define TRY do{ jmp_buf ex_buf__; if( !setjmp(ex_buf__) ){
-#define CATCH } else {
-#define ETRY } }while(0)
-#define THROW longjmp(ex_buf__, 1)
+#include "definitions.h"
+#include "functions.h"
 
 logread_args opt_parser(int32_t argc, char **argv) {
 	int32_t index;
@@ -63,33 +60,37 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			args.listEmployeesWithoutTime = 1;
 			break;
 		case 'K':
-			len = strlen(optarg);
-			args.token = (char *) malloc(len + 1);
-			strcpy(args.token, optarg);
+			len = MIN(strlen(optarg), MAX_ONE);
+			nameOpt(optarg);
+			args.token = (char *) calloc(MAX, 1);
+			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
-			len = strlen(optarg);
+			len = MIN(strlen(optarg), MAX_ONE);
+			nameOpt(optarg);
 			if (args.printSpecificRooms_I) {
-				char * person = (char *) malloc(len + 1);
-				strcpy(person, optarg);
+				char * person = (char *) calloc(MAX, 1);
+				strncpy(person, optarg, len);
 				stack_push(&args.peoples_I, person);
 			} else {
-				args.employeeName = (char *) malloc(len + 1);
-				strcpy(args.employeeName, optarg);
+				args.employeeName = (char *) calloc(MAX, 1);
+				strncpy(args.employeeName, optarg, len);
 			}
 			break;
 		case 'G':
-			len = strlen(optarg);
+			len = MIN(strlen(optarg), MAX_ONE);
+			nameOpt(optarg);
 			if (args.printSpecificRooms_I) {
-				char * person = (char *) malloc(len + 1);
-				strcpy(person, optarg);
+				char * person = (char *) calloc(MAX, 1);
+				strncpy(person, optarg, len);
 				stack_push(&args.peoples_I, person);
 			} else {
-				args.guestName = (char *) malloc(len + 1);
-				strcpy(args.guestName, optarg);
+				args.guestName = (char *) calloc(MAX, 1);
+				strncpy(args.guestName, optarg, len);
 			}
 			break;
 		case 'L':
+			numOpt(optarg);
 			if (args.listEmployeesWithoutTime
 					&& args.bounds->upper > args.bounds->lower) {
 				args.bounds->lower1 = atoi(optarg);
@@ -98,6 +99,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			}
 			break;
 		case 'U':
+			numOpt(optarg);
 			if (args.listEmployeesWithoutTime
 					&& args.bounds->upper > args.bounds->lower) {
 				args.bounds->upper1 = atoi(optarg);
@@ -106,12 +108,7 @@ logread_args opt_parser(int32_t argc, char **argv) {
 			}
 			break;
 		case '?':
-			if (optopt == 'c')
-				debug("Option -%c requires an argument.\n", optopt);
-			else if (isprint(optopt))
-				debug("Unknown option `-%c'.\n", optopt);
-			else
-				debug("Unknown option character `\\x%x'.\n", optopt);
+			invalid();
 			break;
 		default:
 			invalid();

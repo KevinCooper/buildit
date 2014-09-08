@@ -15,6 +15,8 @@
 #include "dictionary.h"
 #include "htmlPrint.h"
 
+#define NULL_CHECK(val)  if (val == NULL) invalid_0();
+
 void buildDataStructs(logappend_args *temp);
 void doBadThings(logread_args* args);
 void sortLinkedList_Names(Node *head);
@@ -25,9 +27,8 @@ HT* allMahHashes;
 Node *peopleHead;
 int32_t highestRoomNum;
 int32_t lastTime;
-//
+
 int main(int argc, char * argv[]) {
-	volatile int blah;
 	peopleHead = NULL;
 	allMahHashes = ht_create(65536);
 	int32_t fileSize = 0;
@@ -78,7 +79,7 @@ void buildDataStructs(logappend_args *temp) {
 
 	person* currPerson = ht_get(allMahHashes, name);
 	if (currPerson == NULL) {
-		currPerson = malloc(sizeof(person));
+		currPerson = calloc(1, sizeof(person));
 		currPerson->rooms = NULL;
 		strcpy(currPerson->name, name);
 		currPerson->isEmployee = isemployee;
@@ -90,7 +91,7 @@ void buildDataStructs(logappend_args *temp) {
 		stack_push(&peopleHead, currPerson);
 	} else if (temp->eventArrival == 1 && temp->roomID != -1) {
 		currPerson->roomID = temp->roomID;
-		int32_t * tempNum = malloc(sizeof(int32_t));
+		int32_t * tempNum = calloc(1, sizeof(int32_t));
 		*tempNum = temp->roomID;
 		stack_push(&currPerson->rooms, tempNum);
 		if (currPerson->roomID > highestRoomNum)
@@ -167,6 +168,7 @@ void doBadThings(logread_args* args) {
 		} else {
 			blahzz = ht_get(allMahHashes, args->guestName);
 		}
+		NULL_CHECK(blahzz)
 		Node* temp = blahzz->rooms;
 		reverse(&temp);
 		uint32_t isFirst = 1;
@@ -193,15 +195,15 @@ void doBadThings(logread_args* args) {
 		} else {
 			blahzz = ht_get(allMahHashes, args->guestName);
 		}
-		if (blahzz != NULL) {
-			int32_t timespent;
-			if (blahzz->leaveTime == -1) {
-				timespent = lastTime - blahzz->enterTime;
-			} else {
-				timespent = blahzz->leaveTime - blahzz->enterTime;
-			}
-			printf("%d", timespent);
+		NULL_CHECK(blahzz)
+
+		int32_t timespent;
+		if (blahzz->leaveTime == -1) {
+			timespent = lastTime - blahzz->enterTime;
+		} else {
+			timespent = blahzz->leaveTime - blahzz->enterTime;
 		}
+		printf("%d", timespent);
 
 	} else if (args->listEmployeesWithTime
 			&& args->bounds->upper > args->bounds->lower) {
@@ -275,8 +277,7 @@ void doBadThings(logread_args* args) {
 		while (temp) {
 			char * personName = (char *) temp->data;
 			person* currPerson = ht_get(allMahHashes, personName);
-			if (currPerson == NULL)
-				invalid();
+			NULL_CHECK(currPerson)
 			if (isFirst) {
 				roomList = currPerson->rooms;
 				sortLinkedList_Nums(roomList);
@@ -287,7 +288,7 @@ void doBadThings(logread_args* args) {
 					int32_t * tempAA = oldList->data;
 					int32_t * tempBB = currPerson->rooms->data;
 					if (*tempAA == *tempBB) {
-						int32_t * tempNum = malloc(sizeof(int32_t));
+						int32_t * tempNum = calloc(1, sizeof(int32_t));
 						*tempNum = *tempAA;
 						stack_push(&roomList, tempNum);
 						oldList = oldList->next;

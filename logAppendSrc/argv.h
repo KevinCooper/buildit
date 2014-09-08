@@ -8,7 +8,7 @@
 #ifndef ARGV_H_
 #define ARGV_H_
 
-static int count_argc(const char *str);
+int count_argc(const char *str);
 void argv_free(char **argv);
 char **argv_split(const char *str, int *argcp);
 

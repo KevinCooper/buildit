@@ -1,5 +1,23 @@
 #include "functions.h"
 
+void nameOpt(char * input) {
+	reti = regcomp(&regex, "[^a-zA-Z0-9]", 0);
+	reti = regexec(&regex, input, 0, NULL, 0);
+	if (!reti) {
+		invalid();
+	}
+	regfree(&regex);
+}
+
+void numOpt(char * input) {
+	reti = regcomp(&regex, "[^0-9]", 0);
+	reti = regexec(&regex, input, 0, NULL, 0);
+	if (!reti) {
+		invalid();
+	}
+	regfree(&regex);
+}
+
 void printMD5(char * toPrint) {
 	int i;
 	printf("0x");
@@ -30,12 +48,11 @@ int check_logic(logappend_args * args) {
 	}
 
 	if (newUser == NULL) {
-		newUser = malloc(sizeof(logicUser));
+		newUser = calloc(1, sizeof(logicUser));
 		strcpy(newUser->name, name);
 		newUser->inBuilding = 0;
 		newUser->inRoom = 0;
 		newUser->roomID = 0;
-		//TODO: Possible bug in placement of this code
 		if(args->employeeName != NULL){
 			ht_put(allMahHashes_employees, newUser->name, newUser);
 		}else{
