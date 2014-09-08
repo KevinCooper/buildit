@@ -44,9 +44,9 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 			break;
 		case 'K':
 			len = MIN(strlen(optarg), MAX_ONE);
-			args.token =  calloc(MAX, 1);
+			args.token = calloc(MAX, 1);
 			if (checkInput)
-				nameOpt(optarg);
+				tokenOpt(optarg);
 			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
@@ -70,8 +70,8 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 			args.eventDeparture = 1;
 			break;
 		case 'R':
-			if(checkInput)
-			numOpt(optarg);
+			if (checkInput)
+				numOpt(optarg);
 			args.roomID = atoi(optarg);
 			break;
 		case '?':
@@ -115,7 +115,7 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 
 //FIXME: Maybe strings larger than 256?
 void * toString(logappend_args* args) {
-	char * string =  calloc(256, 1);
+	char * string = calloc(256, 1);
 	char str[15];
 	if (args->batchFile != NULL) {
 		sprintf(string, "-B %s ", args->batchFile);

@@ -23,14 +23,16 @@ void sortLinkedList_Names(Node *head);
 void whyIsTheHTMLFormatDifferent_S(logread_args* args);
 void sortLinkedList_Nums(Node *head);
 
-HT* allMahHashes;
+HT* allMahHashes_employees;
+HT* allMahHashes_guests;
 Node *peopleHead;
 int32_t highestRoomNum;
 int32_t lastTime;
 
 int main(int argc, char * argv[]) {
 	peopleHead = NULL;
-	allMahHashes = ht_create(65536);
+	allMahHashes_employees = ht_create(65536);
+	allMahHashes_guests = ht_create(65536);
 	int32_t fileSize = 0;
 	FILE* file = NULL;
 	size_t bytes = 0;
@@ -69,15 +71,16 @@ int main(int argc, char * argv[]) {
 void buildDataStructs(logappend_args *temp) {
 	int32_t isemployee = 0;
 	char * name = NULL;
+	person* currPerson;
 	if (temp->employeeName == NULL) {
 		name = temp->guestName;
-
+		currPerson = ht_get(allMahHashes_guests, name);
 	} else {
 		name = temp->employeeName;
+		currPerson = ht_get(allMahHashes_employees, name);
 		isemployee = 1;
 	}
 
-	person* currPerson = ht_get(allMahHashes, name);
 	if (currPerson == NULL) {
 		currPerson = calloc(1, sizeof(person));
 		currPerson->rooms = NULL;
@@ -87,7 +90,11 @@ void buildDataStructs(logappend_args *temp) {
 		currPerson->inBuilding = 1;
 		currPerson->leaveTime = -1;
 		currPerson->enterTime = temp->timestamp;
-		ht_put(allMahHashes, currPerson->name, currPerson);
+		if (isemployee) {
+			ht_put(allMahHashes_employees, currPerson->name, currPerson);
+		} else {
+			ht_put(allMahHashes_guests, currPerson->name, currPerson);
+		}
 		stack_push(&peopleHead, currPerson);
 	} else if (temp->eventArrival == 1 && temp->roomID != -1) {
 		currPerson->roomID = temp->roomID;
@@ -164,9 +171,9 @@ void doBadThings(logread_args* args) {
 	} else if (args->listAllRooms_R) {
 		person* blahzz;
 		if (args->employeeName != NULL) {
-			blahzz = ht_get(allMahHashes, args->employeeName);
+			blahzz = ht_get(allMahHashes_employees, args->employeeName);
 		} else {
-			blahzz = ht_get(allMahHashes, args->guestName);
+			blahzz = ht_get(allMahHashes_guests, args->guestName);
 		}
 		NULL_CHECK(blahzz)
 		Node* temp = blahzz->rooms;
@@ -191,9 +198,9 @@ void doBadThings(logread_args* args) {
 	} else if (args->totalTime) {
 		person* blahzz;
 		if (args->employeeName != NULL) {
-			blahzz = ht_get(allMahHashes, args->employeeName);
+			blahzz = ht_get(allMahHashes_employees, args->employeeName);
 		} else {
-			blahzz = ht_get(allMahHashes, args->guestName);
+			blahzz = ht_get(allMahHashes_guests, args->guestName);
 		}
 		NULL_CHECK(blahzz)
 
@@ -276,7 +283,9 @@ void doBadThings(logread_args* args) {
 		Node * oldList = NULL;
 		while (temp) {
 			char * personName = (char *) temp->data;
-			person* currPerson = ht_get(allMahHashes, personName);
+			person* currPerson = ht_get(allMahHashes_employees, personName);
+			if(currPerson == NULL)
+				currPerson = ht_get(allMahHashes_guests, personName);
 			NULL_CHECK(currPerson)
 			if (isFirst) {
 				roomList = currPerson->rooms;

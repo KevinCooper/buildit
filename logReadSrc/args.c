@@ -62,7 +62,7 @@ logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 		case 'K':
 			len = MIN(strlen(optarg), MAX_ONE);
 			if (checkInput)
-				nameOpt(optarg);
+				tokenOpt(optarg);
 			args.token =  calloc(MAX, 1);
 			strncpy(args.token, optarg, len);
 			break;

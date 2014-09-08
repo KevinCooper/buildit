@@ -34,7 +34,7 @@ void invalid();
 void printMD5(char * toPrint);
 void invalid_token();
 void nameOpt(char * input);
-
+void tokenOpt(char * input);
 void numOpt(char * input);
 
 

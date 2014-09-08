@@ -1,7 +1,16 @@
 #include "functions.h"
 
-void nameOpt(char * input) {
+void tokenOpt(char * input) {
 	reti = regcomp(&regex, "[^a-zA-Z0-9]", 0);
+	reti = regexec(&regex, input, 0, NULL, 0);
+	if (!reti) {
+		invalid();
+	}
+	regfree(&regex);
+}
+
+void nameOpt(char * input) {
+	reti = regcomp(&regex, "[^a-zA-Z]", 0);
 	reti = regexec(&regex, input, 0, NULL, 0);
 	if (!reti) {
 		invalid();
