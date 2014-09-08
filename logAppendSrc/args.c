@@ -40,8 +40,6 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 		case 'B':
 			len = MIN(strlen(optarg), MAX_ONE);
 			args.batchFile = (char *) calloc(MAX, 1);
-			if (checkInput)
-				nameOpt(optarg);
 			strncpy(args.batchFile, optarg, len);
 			break;
 		case 'K':
