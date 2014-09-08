@@ -16,6 +16,7 @@
 #include "htmlPrint.h"
 
 #define NULL_CHECK(val)  if (val == NULL) invalid_0();
+#define NULL_CHECK_INV(val)  if (val == NULL) invalid();
 
 void buildDataStructs(logappend_args *temp);
 void doBadThings(logread_args* args);
@@ -49,6 +50,7 @@ int main(int argc, char * argv[]) {
 	if (fileSize < 10)
 		invalid();
 	file = fopen(args.logName, "r");
+	NULL_CHECK_INV(file);
 	//Line by line apply the options
 	while ((read = getline(&line, &bytes, file)) != -1 && fileSize > 16) {
 

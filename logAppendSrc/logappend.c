@@ -18,6 +18,8 @@ void processLine(logappend_args args, int32_t CheckAndHashBool);
 void checkMahFile(logappend_args args);
 void inter(logappend_args args);
 
+#define NULL_CHECK(val)  if (val == NULL) invalid();
+
 MD5_CTX oldMD5;
 MD5_CTX currentMD5;
 MD5_CTX newMD5;
@@ -148,6 +150,7 @@ void processLine(logappend_args args, int32_t isLastLine) {
 	} else {
 		mahFile = fopen(args.logName, "r+");
 	}
+	NULL_CHECK(mahFile)
 	//Write the current line to the file
 	if (fileSize < 16) {
 		fwrite(args.toString, sizeof(char), strlen(args.toString), mahFile);
