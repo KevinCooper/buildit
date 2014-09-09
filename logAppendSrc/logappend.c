@@ -54,8 +54,6 @@ int main(int argc, char * argv[]) {
 		isBatch = 1;
 		batch(args);
 	} else {
-		if (fileSize < 10)
-			invalid();
 		cryptWrapper(&args, DECRYPT);
 		isBatch = 0;
 		inter(args);
