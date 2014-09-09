@@ -80,7 +80,12 @@ logappend_args opt_parser_log(int32_t argc, char **argv) {
 
 	index = optind;
 
-	if ((args.eventArrival == -1 && args.eventDeparture == -1)
+	if (args.batchFile != NULL) {
+
+	} else if (args.timestamp
+			== -1|| args.token == NULL || args.logName == NULL) {
+
+	} else if ((args.eventArrival == -1 && args.eventDeparture == -1)
 			|| (args.eventArrival == 1 && args.eventDeparture == 1)) {
 		invalid();
 	} else if ((args.employeeName == NULL && args.guestName == NULL)
