@@ -49,32 +49,21 @@ int main(int argc, char * argv[]) {
 		invalid();
 
 	int32_t fileSize = fsize(args.logName);
-	if (fileSize > 10) {
-		unsigned int salt[] = { 12345, 54321 };
-		FILE * encrypted_file = fopen(args.logName, "r");
-		FILE * decrypted = fopen("tempblahman", "w+");
-		do_crypt(encrypted_file, decrypted, DECRYPT, args.token,
-				strlen(args.token), (unsigned char *) salt);
-		rename("tempblahman", args.logName);
-	}
 
 	if (args.batchFile) {
 		isBatch = 1;
 		batch(args);
 	} else {
+		if (fileSize < 10)
+			invalid();
+		cryptWrapper(&args, DECRYPT);
 		isBatch = 0;
 		inter(args);
 		if (check_logic(&args) == -1)
 			invalid_check(&args);
 		processLine(args, 1);
+		cryptWrapper(&args, ENCRYPT);
 	}
-
-	unsigned int salt[] = { 12345, 54321 };
-	FILE * decrypted_file = fopen(args.logName, "r");
-	FILE * encrypted = fopen("tempblahman", "w+");
-	do_crypt(decrypted_file, encrypted, ENCRYPT, args.token, strlen(args.token),
-			(unsigned char *) salt);
-	rename("tempblahman", args.logName);
 
 	return 0;
 }
@@ -119,7 +108,7 @@ void batch(logappend_args args) {
 	ssize_t read = 0;
 	char * line = NULL;
 	char interString[MAX * 4];
-
+	logappend_args temp;
 	fileSize = fsize(args.batchFile);
 	if (fileSize < 10)
 		invalid_check(&args);
@@ -133,10 +122,11 @@ void batch(logappend_args args) {
 		sprintf(interString, "./logappend %s", line);
 		int tempc;
 		char ** tempv = argv_split(interString, &tempc);
-		logappend_args temp = opt_parser(tempc, tempv, 1);
+		temp = opt_parser(tempc, tempv, 1);
 		if (temp.batchFile)
 			continue;
 		if (firstRun) {
+			cryptWrapper(&temp, DECRYPT);
 			inter(temp);
 		}
 		if (check_logic(&temp) == -1)
@@ -147,7 +137,7 @@ void batch(logappend_args args) {
 		argv_free(tempv);
 		// FINISH LOGICZ
 	}
-
+	cryptWrapper(&temp, ENCRYPT);
 }
 
 void processLine(logappend_args args, int32_t isLastLine) {

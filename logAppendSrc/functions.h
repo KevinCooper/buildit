@@ -36,5 +36,6 @@ void nameOpt(char * input);
 void tokenOpt(char * input);
 void numOpt(char * input);
 void invalid_check(logappend_args * args);
+void cryptWrapper(logappend_args * args, int32_t type);
 
 #endif /* FUNCTIONS_H_ */

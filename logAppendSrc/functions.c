@@ -9,6 +9,18 @@ void tokenOpt(char * input) {
 	regfree(&regex);
 }
 
+void cryptWrapper(logappend_args * args, int32_t type) {
+	uint32_t salt[] = { 12345, 54321 };
+	int32_t fileSize = fsize(args->logName);
+	if (fileSize < 16)
+		return;
+	FILE * encrypted_file = fopen(args->logName, "r");
+	FILE * decrypted = fopen("tempblahman", "w");
+	do_crypt(encrypted_file, decrypted, type, args->token, strlen(args->token),
+			(unsigned char *) salt);
+	rename("tempblahman", args->logName);
+}
+
 void nameOpt(char * input) {
 	regcomp(&regex, "[^a-zA-Z]", 0);
 	reti = regexec(&regex, input, 0, NULL, 0);
@@ -171,12 +183,8 @@ void invalid() {
 }
 void invalid_check(logappend_args * args) {
 	printf("invalid\n");
-	unsigned int salt[] = { 12345, 54321 };
-	FILE * decrypted_file = fopen(args->logName, "r");
-	FILE * encrypted = fopen("tempblahman", "w+");
-	do_crypt(decrypted_file, encrypted, 1, args->token, strlen(args->token),
-			(unsigned char *) salt);
-	rename("tempblahman", args->logName);
+	//encrypt
+	cryptWrapper(args, 1);
 	if (isBatch) {
 		exit(0);
 	} else {

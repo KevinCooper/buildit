@@ -94,6 +94,17 @@ int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
 	return 1;
 }
 
+void invalid_check(logread_args * args) {
+	printf("invalid\n");
+	unsigned int salt[] = { 12345, 54321 };
+	FILE * decrypted_file = fopen(args->logName, "r");
+	FILE * encrypted = fopen("tempblahman", "w+");
+	do_crypt(decrypted_file, encrypted, 1, args->token, strlen(args->token),
+			(unsigned char *) salt);
+	rename("tempblahman", args->logName);
+	exit(-1);
+}
+
 void invalid() {
 	printf("invalid\n");
 	exit(-1);
