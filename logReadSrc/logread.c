@@ -207,15 +207,14 @@ void doBadThings(logread_args* args) {
 		} else {
 			blahzz = ht_get(allMahHashes_guests, args->guestName);
 		}
-		if (blahzz == NULL)
-			break;
 
 		int32_t timespent;
-		if (blahzz->leaveTime == -1) {
+		if (blahzz != NULL && blahzz->leaveTime == -1) {
 			timespent = lastTime - blahzz->enterTime;
 		} else {
 			timespent = blahzz->leaveTime - blahzz->enterTime;
 		}
+		if (blahzz != NULL)
 		printf("%d", timespent);
 
 	} else if (args->listEmployeesWithTime
