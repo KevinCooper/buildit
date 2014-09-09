@@ -27,8 +27,6 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 	int32_t len = 0;
 	optind = 0;  //This must occur to have getopt back in its correct state!
 
-//TODO: Check for invalid inputs (Token Flag with no opt, will give ":" )
-
 	while ((c = getopt(argc, argv, "T:B:K:E:G:ALR:")) != -1) {
 		//debug("%c", c);
 		switch (c) {
@@ -113,9 +111,8 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 	return args;
 }
 
-//FIXME: Maybe strings larger than 256?
 void * toString(logappend_args* args) {
-	char * string = calloc(256, 1);
+	char * string = calloc(MAX*4, 1);
 	char str[15];
 	if (args->batchFile != NULL) {
 		sprintf(string, "-B %s ", args->batchFile);
