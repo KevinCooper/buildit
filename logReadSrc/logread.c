@@ -42,7 +42,7 @@ int main(int argc, char * argv[]) {
 	size_t bytes = 0;
 	ssize_t read = 0;
 	char * line = NULL;
-	char interString[MAX*4];
+	char interString[MAX * 4];
 
 	//get Logreader arguements
 	logread_args args = opt_parser(argc, argv, 1);
@@ -72,7 +72,7 @@ int main(int argc, char * argv[]) {
 		char ** tempv = argv_split(interString, &tempc);
 		logappend_args temp = opt_parser_log(tempc, tempv);
 		buildDataStructs(&temp);
-		bzero(interString, MAX*4);
+		bzero(interString, MAX * 4);
 		argv_free(tempv);
 		// FINISH LOGICZ
 	}
@@ -305,10 +305,12 @@ void doBadThings(logread_args* args) {
 		Node * roomList = NULL;
 		Node * oldList = NULL;
 		while (temp) {
-			char * personName = (char *) temp->data;
-			person* currPerson = ht_get(allMahHashes_employees, personName);
-			if (currPerson == NULL)
-				currPerson = ht_get(allMahHashes_guests, personName);
+			person * tempPerson = (person *) temp->data;
+			person* currPerson =
+					tempPerson->isEmployee ?
+							ht_get(allMahHashes_employees, tempPerson->name) :
+							ht_get(allMahHashes_guests, tempPerson->name);
+
 			if (currPerson) {
 				if (isFirst) {
 					roomList = currPerson->rooms;

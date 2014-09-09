@@ -63,7 +63,7 @@ logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 			len = MIN(strlen(optarg), MAX_ONE);
 			if (checkInput)
 				tokenOpt(optarg);
-			args.token =  calloc(MAX, 1);
+			args.token = calloc(MAX, 1);
 			strncpy(args.token, optarg, len);
 			break;
 		case 'E':
@@ -71,11 +71,12 @@ logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 			if (checkInput)
 				nameOpt(optarg);
 			if (args.printSpecificRooms_I) {
-				char * person =  calloc(MAX, 1);
-				strncpy(person, optarg, len);
-				stack_push(&args.peoples_I, person);
+				person * currPerson = calloc(1, sizeof(person));
+				strncpy(currPerson->name, optarg, len);
+				currPerson->isEmployee = 1;
+				stack_push(&args.peoples_I, currPerson);
 			} else {
-				args.employeeName =  calloc(MAX, 1);
+				args.employeeName = calloc(MAX, 1);
 				strncpy(args.employeeName, optarg, len);
 			}
 			break;
@@ -84,9 +85,10 @@ logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 			if (checkInput)
 				nameOpt(optarg);
 			if (args.printSpecificRooms_I) {
-				char * person =  calloc(MAX, 1);
-				strncpy(person, optarg, len);
-				stack_push(&args.peoples_I, person);
+				person * currPerson = calloc(1, sizeof(person));
+				strncpy(currPerson->name, optarg, len);
+				currPerson->isEmployee = 0;
+				stack_push(&args.peoples_I, currPerson);
 			} else {
 				args.guestName = calloc(MAX, 1);
 				strncpy(args.guestName, optarg, len);
