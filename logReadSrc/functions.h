@@ -20,10 +20,8 @@
 
 void printMD5(char * toPrint);
 off_t fsize(const char *filename);
-int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt, EVP_CIPHER_CTX *e_ctx, EVP_CIPHER_CTX *d_ctx);
-unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext, int *len);
-unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext, int *len);
-void checkMahFile(logread_args args);
+int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
+		int key_data_len, unsigned char *salt);
 void invalid();
 void invalid_0();
 void invalid_token();

@@ -111,75 +111,54 @@ int check_logic(logappend_args * args) {
 	return 1;
 }
 
-/**
- * Create an 256 bit key and IV using the supplied key_data. salt can be added for taste.
- * Fills in the encryption and decryption ctx objects and returns 0 on success
- **/
-int aes_init(unsigned char *key_data, int key_data_len, unsigned char *salt,
-		EVP_CIPHER_CTX *e_ctx, EVP_CIPHER_CTX *d_ctx) {
+int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
+		int key_data_len, unsigned char *salt) {
+	/* Allow enough space in output buffer for additional block */
 	int i, nrounds = 5;
-	unsigned char key[32], iv[32];
-
-	/*
-	 * Gen key & IV for AES 256 CBC mode. A SHA1 digest is used to hash the supplied key material.
-	 * nrounds is the number of times the we hash the material. More rounds are more secure but
-	 * slower.
+	unsigned char key[16], iv[16];
+	unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH];
+	memset(inbuf, 0, 1024);
+	int inlen, outlen;
+	EVP_CIPHER_CTX ctx;
+	/* Bogus key and IV: we'd normally set these from
+	 * another source.
 	 */
-	i = EVP_BytesToKey(EVP_aes_256_cbc(), EVP_sha1(), salt, key_data,
+	i = EVP_BytesToKey(EVP_aes_128_cbc(), EVP_sha1(), salt, key_data,
 			key_data_len, nrounds, key, iv);
-	if (i != 32) {
+	if (i != 16) {
 		printf("Key size is %d bits - should be 256 bits\n", i);
 		return -1;
 	}
-
-	EVP_CIPHER_CTX_init(e_ctx);
-	EVP_EncryptInit_ex(e_ctx, EVP_aes_256_cbc(), NULL, key, iv);
-	EVP_CIPHER_CTX_init(d_ctx);
-	EVP_DecryptInit_ex(d_ctx, EVP_aes_256_cbc(), NULL, key, iv);
-
-	return 0;
-}
-
-/*
- * Encrypt *len bytes of data
- * All data going in & out is considered binary (unsigned char[])
- */
-unsigned char *aes_encrypt(EVP_CIPHER_CTX *e, unsigned char *plaintext,
-		int *len) {
-	/* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
-	int c_len = *len + AES_BLOCK_SIZE;
-	int f_len = 0;
-	unsigned char *ciphertext = malloc(c_len);
-
-	/* allows reusing of 'e' for multiple encryption cycles */
-	EVP_EncryptInit_ex(e, NULL, NULL, NULL, NULL);
-
-	/* update ciphertext, c_len is filled with the length of ciphertext generated,
-	 *len is the size of plaintext in bytes */
-	EVP_EncryptUpdate(e, ciphertext, &c_len, plaintext, *len);
-
-	/* update ciphertext with the final remaining bytes */
-	EVP_EncryptFinal_ex(e, ciphertext + c_len, &f_len);
-
-	*len = c_len + f_len;
-	return ciphertext;
-}
-
-/*
- * Decrypt *len bytes of ciphertext
- */
-unsigned char *aes_decrypt(EVP_CIPHER_CTX *e, unsigned char *ciphertext,
-		int *len) {
-	/* because we have padding ON, we must allocate an extra cipher block size of memory */
-	int p_len = *len, f_len = 0;
-	unsigned char *plaintext = malloc(p_len + AES_BLOCK_SIZE);
-
-	EVP_DecryptInit_ex(e, NULL, NULL, NULL, NULL);
-	EVP_DecryptUpdate(e, plaintext, &p_len, ciphertext, *len);
-	EVP_DecryptFinal_ex(e, plaintext + p_len, &f_len);
-
-	*len = p_len + f_len;
-	return plaintext;
+	/* Don't set key or IV right away; we want to check lengths */
+	EVP_CIPHER_CTX_init(&ctx);
+	EVP_CipherInit_ex(&ctx, EVP_aes_128_cbc(), NULL, NULL, NULL, do_encrypt);
+	OPENSSL_assert(EVP_CIPHER_CTX_key_length(&ctx) == 16);
+	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(&ctx) == 16);
+	/* Now we can set key and IV */
+	EVP_CipherInit_ex(&ctx, NULL, NULL, key, iv, do_encrypt);
+	for (;;) {
+		memset(outbuf, 0, 1024 + EVP_MAX_BLOCK_LENGTH);
+		inlen = fread(inbuf, 1, 1024, in);
+		if (inlen <= 0)
+			break;
+		if (!EVP_CipherUpdate(&ctx, outbuf, &outlen, inbuf, inlen)) {
+			/* Error */
+			EVP_CIPHER_CTX_cleanup(&ctx);
+			return 0;
+		}
+		fwrite(outbuf, 1, outlen, out);
+		memset(inbuf, 0, 1024);
+	}
+	if (!EVP_CipherFinal_ex(&ctx, outbuf, &outlen)) {
+		/* Error */
+		EVP_CIPHER_CTX_cleanup(&ctx);
+		invalid_token();
+	}
+	fwrite(outbuf, 1, outlen, out);
+	EVP_CIPHER_CTX_cleanup(&ctx);
+	fclose(in);
+	fclose(out);
+	return 1;
 }
 
 void invalid() {

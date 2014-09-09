@@ -15,6 +15,9 @@
 #include "dictionary.h"
 #include "htmlPrint.h"
 
+#define DECRYPT 0
+#define ENCRYPT 1
+
 #define NULL_CHECK(val)  if (val == NULL) invalid_0();
 #define NULL_CHECK_INV(val)  if (val == NULL) invalid();
 
@@ -44,11 +47,19 @@ int main(int argc, char * argv[]) {
 	//get Logreader arguements
 	logread_args args = opt_parser(argc, argv, 1);
 	//Verify integrity and hopefully the syntax should be right
-	checkMahFile(args);
 
 	fileSize = fsize(args.logName);
-	if (fileSize < 10)
+	if (fileSize > 15) {
+		unsigned int salt[] = { 12345, 54321 };
+		FILE * encrypted_file = fopen(args.logName, "r");
+		FILE * decrypted = fopen("tempblahman", "w+");
+		do_crypt(encrypted_file, decrypted, DECRYPT, args.token,
+				strlen(args.token), (unsigned char *) salt);
+		rename("tempblahman", args.logName);
+	} else {
 		invalid();
+	}
+
 	file = fopen(args.logName, "r");
 	NULL_CHECK_INV(file);
 	//Line by line apply the options
@@ -67,6 +78,14 @@ int main(int argc, char * argv[]) {
 		// FINISH LOGICZ
 	}
 	doBadThings(&args);
+
+	unsigned int salt[] = { 12345, 54321 };
+	FILE * decrypted_file = fopen(args.logName, "r");
+	FILE * encrypted = fopen("tempblahman", "w+");
+	do_crypt(decrypted_file, encrypted, ENCRYPT, args.token, strlen(args.token),
+			(unsigned char *) salt);
+	rename("tempblahman", args.logName);
+
 	return 0;
 }
 
@@ -215,7 +234,7 @@ void doBadThings(logread_args* args) {
 			timespent = blahzz->leaveTime - blahzz->enterTime;
 		}
 		if (blahzz != NULL)
-		printf("%d", timespent);
+			printf("%d", timespent);
 
 	} else if (args->listEmployeesWithTime
 			&& args->bounds->upper > args->bounds->lower) {

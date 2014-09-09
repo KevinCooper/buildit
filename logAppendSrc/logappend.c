@@ -13,9 +13,11 @@
 #include "argv.h"
 #include "functions.h"
 
+#define DECRYPT 0
+#define ENCRYPT 1
+
 void batch(logappend_args args);
 void processLine(logappend_args args, int32_t CheckAndHashBool);
-void checkMahFile(logappend_args args);
 void inter(logappend_args args);
 
 #define NULL_CHECK(val)  if (val == NULL) invalid();
@@ -37,7 +39,6 @@ HT* allMahHashes_employees = NULL;
 int main(int argc, char * argv[]) {
 	if (argc < 3)
 		invalid();
-	oldHashExists = 1;
 	oldTime = -1;
 	firstRun = 1;
 	logappend_args args = opt_parser(argc, argv, 1);
@@ -47,22 +48,35 @@ int main(int argc, char * argv[]) {
 	if (args.returnStatus == -1)
 		invalid();
 
+	int32_t fileSize = fsize(args.logName);
+	if (fileSize > 10) {
+		unsigned int salt[] = { 12345, 54321 };
+		FILE * encrypted_file = fopen(args.logName, "r");
+		FILE * decrypted = fopen("tempblahman", "w+");
+		do_crypt(encrypted_file, decrypted, DECRYPT, args.token,
+				strlen(args.token), (unsigned char *) salt);
+		rename("tempblahman", args.logName);
+	}
+
 	if (args.batchFile) {
 		isBatch = 1;
 		batch(args);
 	} else {
 		isBatch = 0;
-		checkMahFile(args);
 		inter(args);
 		if (check_logic(&args) == -1)
 			invalid();
 		processLine(args, 1);
 	}
-	if (isBatch) {
-		return 0;
-	} else {
-		return 0;
-	}
+
+	unsigned int salt[] = { 12345, 54321 };
+	FILE * decrypted_file = fopen(args.logName, "r");
+	FILE * encrypted = fopen("tempblahman", "w+");
+	do_crypt(decrypted_file, encrypted, ENCRYPT, args.token, strlen(args.token),
+			(unsigned char *) salt);
+	rename("tempblahman", args.logName);
+
+	return 0;
 }
 
 void inter(logappend_args args) {
@@ -71,20 +85,20 @@ void inter(logappend_args args) {
 	size_t bytes = 0;
 	ssize_t read = 0;
 	char * line = NULL;
-	char interString[256];
+	char interString[MAX * 4];
 
 	fileSize = fsize(args.logName);
-	if (fileSize < 16) {
+	if (fileSize < 10) {
 		return;
 	} else {
 		mahFile = fopen(args.logName, "r");
 	}
 
-	while ((read = getline(&line, &bytes, mahFile)) != -1 && fileSize > 16) {
+	while ((read = getline(&line, &bytes, mahFile)) != -1 && fileSize > 10) {
 
 		int len = strlen(line);
 		fileSize = fileSize - len;
-		bzero(interString, 256);
+		bzero(interString, MAX * 4);
 		// RERUN COMMANDS CAUZE LOGIC!
 		sprintf(interString, "./logappend %s", line);
 		int tempc;
@@ -104,7 +118,7 @@ void batch(logappend_args args) {
 	size_t bytes = 0;
 	ssize_t read = 0;
 	char * line = NULL;
-	char interString[256];
+	char interString[MAX * 4];
 
 	fileSize = fsize(args.batchFile);
 	if (fileSize < 10)
@@ -123,14 +137,13 @@ void batch(logappend_args args) {
 		if (temp.batchFile)
 			continue;
 		if (firstRun) {
-			checkMahFile(temp);
 			inter(temp);
 		}
 		if (check_logic(&temp) == -1)
 			continue;
 		processLine(temp, fileSize < 10 ? 1 : 0);
 		firstRun = 0;
-		bzero(interString, 256);
+		bzero(interString, MAX * 4);
 		argv_free(tempv);
 		// FINISH LOGICZ
 	}
@@ -138,15 +151,12 @@ void batch(logappend_args args) {
 }
 
 void processLine(logappend_args args, int32_t isLastLine) {
-	unsigned char newMD5_S[MD5_DIGEST_LENGTH + 1];
-	MD5_Update(&newMD5, args.toString, strlen(args.toString));
 	int32_t fileSize = 0;
 	FILE* mahFile = NULL;
-	unsigned int md5len = MD5_DIGEST_LENGTH;
 	//Make sure it is a good new first line
 
 	fileSize = fsize(args.logName);
-	if (fileSize < 16) {
+	if (fileSize < 10) {
 		mahFile = fopen(args.logName, "w+");
 	} else {
 		mahFile = fopen(args.logName, "r+");
@@ -156,77 +166,9 @@ void processLine(logappend_args args, int32_t isLastLine) {
 	if (fileSize < 16) {
 		fwrite(args.toString, sizeof(char), strlen(args.toString), mahFile);
 	} else {
-		if (firstRun) {
-			fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
-			firstRun = 0;
-		} else {
-			fseek(mahFile, 0, SEEK_END);
-		}
+		fseek(mahFile, 0, SEEK_END);
 		fwrite(args.toString, sizeof(char), strlen(args.toString), mahFile);
 	}
-	if (isLastLine) {
-		MD5_Final(newMD5_S, &newMD5);
-		EVP_CIPHER_CTX en, de;
-		unsigned int salt[] = { 12345, 54321 };
-		if (aes_init(args.token, strlen(args.token), (unsigned char *) &salt,
-				&en, &de)) {
-			printf("Couldn't initialize AES cipher\n");
-			invalid();
-		}
-		char * ciphertext = aes_encrypt(&en, newMD5_S, &md5len);
-		fwrite(ciphertext, sizeof(char), MD5_DIGEST_LENGTH, mahFile);
-	}
 	fclose(mahFile);
-}
-
-void checkMahFile(logappend_args args) {
-	int32_t fileSize = 0;
-	FILE* mahFile = NULL;
-	char * pathname = args.logName;
-
-	unsigned int md5len = MD5_DIGEST_LENGTH;
-	char* oldMD5 = calloc(MD5_DIGEST_LENGTH + 1, 1);
-	MD5_Init(&currentMD5);
-	MD5_Init(&newMD5);
-	char * line = NULL;
-	size_t bytes = 0;
-	ssize_t read;
-
-	fileSize = fsize(pathname);
-	if (fileSize > 16) {
-		mahFile = fopen(pathname, "r+");
-	} else {
-		return;
-	}
-	//Create an MD5 of the file and verify the syntax stuff
-	while ((read = getline(&line, &bytes, mahFile)) != -1 && fileSize > 16) {
-		int len = strlen(line);
-		fileSize = fileSize - len;
-		MD5_Update(&currentMD5, line, len);
-		MD5_Update(&newMD5, line, len);
-	}
-	unsigned char currentMD5_S[MD5_DIGEST_LENGTH + 1];
-	MD5_Final(currentMD5_S, &currentMD5);
-
-	//Read encrypted MD5 from the file
-	fseek(mahFile, -1 * MD5_DIGEST_LENGTH, SEEK_END);
-	fread(oldMD5, sizeof(unsigned char), MD5_DIGEST_LENGTH, mahFile);
-
-	//Decrypt the old MD5
-	EVP_CIPHER_CTX en, de;
-	unsigned int salt[] = { 12345, 54321 };
-	if (aes_init(args.token, strlen(args.token), (unsigned char *) &salt, &en,
-			&de)) {
-		printf("Couldn't initialize AES cipher\n");
-		invalid();
-	}
-	char* oldMD5_de_S = (char *) aes_decrypt(&de, oldMD5, &md5len);
-
-	if (memcmp(oldMD5_de_S, currentMD5_S, MD5_DIGEST_LENGTH)) {
-		invalid_token();
-	}
-
-	fclose(mahFile);
-	return;
 }
 
