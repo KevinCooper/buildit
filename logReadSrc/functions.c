@@ -62,7 +62,7 @@ int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
 		printf("Key size is %d bits - should be 256 bits\n", i);
 		return -1;
 	}
-	/* Don't set key or IV right away; we want to check lengths */
+	/* Don't set key or IV right away; we want to check length */
 	EVP_CIPHER_CTX_init(&ctx);
 	EVP_CipherInit_ex(&ctx, EVP_des_cbc(), NULL, NULL, NULL, do_encrypt);
 	OPENSSL_assert(EVP_CIPHER_CTX_key_length(&ctx) == 8);
