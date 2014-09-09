@@ -339,10 +339,9 @@ void doBadThings(logread_args* args) {
 		isFirst = 1;
 		if (args->inHTML) {
 			printHeader();
+			printf("<tr>\n<th>Rooms</th>\n</tr>\n");
 		}
 		while (roomList) {
-			if (isFirst)
-				printf("<tr>\n<th>Rooms</th>\n</tr>\n");
 			if (!isFirst && !args->inHTML)
 				printf(",");
 			int32_t * tempNum = roomList->data;
