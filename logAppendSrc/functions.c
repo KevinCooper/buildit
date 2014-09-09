@@ -1,7 +1,7 @@
 #include "functions.h"
 
 void tokenOpt(char * input) {
-	reti = regcomp(&regex, "[^a-zA-Z0-9]", 0);
+	regcomp(&regex, "[^a-zA-Z0-9]", 0);
 	reti = regexec(&regex, input, 0, NULL, 0);
 	if (!reti) {
 		invalid();
@@ -10,7 +10,7 @@ void tokenOpt(char * input) {
 }
 
 void nameOpt(char * input) {
-	reti = regcomp(&regex, "[^a-zA-Z]", 0);
+	regcomp(&regex, "[^a-zA-Z]", 0);
 	reti = regexec(&regex, input, 0, NULL, 0);
 	if (!reti) {
 		invalid();
@@ -19,7 +19,7 @@ void nameOpt(char * input) {
 }
 
 void numOpt(char * input) {
-	reti = regcomp(&regex, "[^0-9]", 0);
+	regcomp(&regex, "[^0-9]", 0);
 	reti = regexec(&regex, input, 0, NULL, 0);
 	if (!reti) {
 		invalid();

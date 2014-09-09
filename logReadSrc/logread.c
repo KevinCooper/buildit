@@ -177,9 +177,9 @@ void doBadThings(logread_args* args) {
 		} else {
 			blahzz = ht_get(allMahHashes_guests, args->guestName);
 		}
-		NULL_CHECK(blahzz)
-		Node* temp = blahzz->rooms;
-		reverse(&temp);
+		Node* temp = blahzz->rooms == NULL ? NULL : blahzz->rooms;
+		if (temp)
+			reverse(&temp);
 		uint32_t isFirst = 1;
 		if (args->inHTML)
 			init_R();
@@ -198,13 +198,17 @@ void doBadThings(logread_args* args) {
 		if (args->inHTML)
 			printFooter();
 	} else if (args->totalTime) {
+
+		if (args->inHTML)
+			invalid();
 		person* blahzz;
 		if (args->employeeName != NULL) {
 			blahzz = ht_get(allMahHashes_employees, args->employeeName);
 		} else {
 			blahzz = ht_get(allMahHashes_guests, args->guestName);
 		}
-		NULL_CHECK(blahzz)
+		if (blahzz == NULL)
+			break;
 
 		int32_t timespent;
 		if (blahzz->leaveTime == -1) {
@@ -286,28 +290,29 @@ void doBadThings(logread_args* args) {
 		while (temp) {
 			char * personName = (char *) temp->data;
 			person* currPerson = ht_get(allMahHashes_employees, personName);
-			if(currPerson == NULL)
+			if (currPerson == NULL)
 				currPerson = ht_get(allMahHashes_guests, personName);
-			NULL_CHECK(currPerson)
-			if (isFirst) {
-				roomList = currPerson->rooms;
-				sortLinkedList_Nums(roomList);
-			} else {
-				oldList = roomList;
-				roomList = NULL;
-				while (oldList && currPerson->rooms) {
-					int32_t * tempAA = oldList->data;
-					int32_t * tempBB = currPerson->rooms->data;
-					if (*tempAA == *tempBB) {
-						int32_t * tempNum = calloc(1, sizeof(int32_t));
-						*tempNum = *tempAA;
-						stack_push(&roomList, tempNum);
-						oldList = oldList->next;
-						currPerson->rooms = currPerson->rooms->next;
-					} else if (*tempAA < *tempBB) {
-						oldList = oldList->next;
-					} else {
-						currPerson->rooms = currPerson->rooms->next;
+			if (currPerson) {
+				if (isFirst) {
+					roomList = currPerson->rooms;
+					sortLinkedList_Nums(roomList);
+				} else {
+					oldList = roomList;
+					roomList = NULL;
+					while (oldList && currPerson->rooms) {
+						int32_t * tempAA = oldList->data;
+						int32_t * tempBB = currPerson->rooms->data;
+						if (*tempAA == *tempBB) {
+							int32_t * tempNum = calloc(1, sizeof(int32_t));
+							*tempNum = *tempAA;
+							stack_push(&roomList, tempNum);
+							oldList = oldList->next;
+							currPerson->rooms = currPerson->rooms->next;
+						} else if (*tempAA < *tempBB) {
+							oldList = oldList->next;
+						} else {
+							currPerson->rooms = currPerson->rooms->next;
+						}
 					}
 				}
 			}
@@ -316,10 +321,10 @@ void doBadThings(logread_args* args) {
 		isFirst = 1;
 		if (args->inHTML) {
 			printHeader();
-			printf("<tr>\n<th>Rooms</th>\n</tr>\n");
 		}
 		while (roomList) {
-
+			if (isFirst)
+				printf("<tr>\n<th>Rooms</th>\n</tr>\n");
 			if (!isFirst && !args->inHTML)
 				printf(",");
 			int32_t * tempNum = roomList->data;

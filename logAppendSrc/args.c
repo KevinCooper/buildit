@@ -84,11 +84,6 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 	if (index < argc) {
 		args.logName = argv[index];
 	}
-	//debug(
-	//		"\nTimestamp: %d\nToken: %s\nEmployee: %s\nGuest: %s\nArrival: %d\nDeparture: %d\nRoomID: %d\nLogName: %s\nBatchName: %s",
-	//		args.timestamp, args.token, args.employeeName, args.guestName,
-	//		args.eventArrival, args.eventDeparture, args.roomID, args.logName,
-	//		args.batchFile);
 
 	if (args.batchFile != NULL) {
 
