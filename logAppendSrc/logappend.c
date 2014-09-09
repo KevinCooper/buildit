@@ -20,7 +20,7 @@ void batch(logappend_args args);
 void processLine(logappend_args args, int32_t CheckAndHashBool);
 void inter(logappend_args args);
 
-#define NULL_CHECK(val)  if (val == NULL) invalid();
+#define NULL_CHECK(val)  if (val == NULL) invalid_check(&args);
 
 MD5_CTX oldMD5;
 MD5_CTX currentMD5;
@@ -65,7 +65,7 @@ int main(int argc, char * argv[]) {
 		isBatch = 0;
 		inter(args);
 		if (check_logic(&args) == -1)
-			invalid();
+			invalid_check(&args);
 		processLine(args, 1);
 	}
 
@@ -122,7 +122,7 @@ void batch(logappend_args args) {
 
 	fileSize = fsize(args.batchFile);
 	if (fileSize < 10)
-		invalid();
+		invalid_check(&args);
 	batchFile = fopen(args.batchFile, "r+");
 
 	while ((read = getline(&line, &bytes, batchFile)) != -1 && fileSize > 16) {

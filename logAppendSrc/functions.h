@@ -35,5 +35,6 @@ void invalid_token();
 void nameOpt(char * input);
 void tokenOpt(char * input);
 void numOpt(char * input);
+void invalid_check(logappend_args * args);
 
 #endif /* FUNCTIONS_H_ */

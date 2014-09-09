@@ -69,7 +69,7 @@ int check_logic(logappend_args * args) {
 		}
 	}
 	if (args->timestamp <= oldTime) {
-		invalid();
+		invalid_check(args);
 	}
 	oldTime = args->timestamp;
 
@@ -80,11 +80,11 @@ int check_logic(logappend_args * args) {
 		if (args->roomID == -1 && !temp->inBuilding) {
 			temp->inBuilding = 1;
 		} else if (args->roomID == -1 && temp->inBuilding) {
-			invalid();
+			invalid_check(args);
 		} else if (args->roomID != -1 && !temp->inBuilding) {
-			invalid();
+			invalid_check(args);
 		} else if (args->roomID != -1 && temp->inRoom) {
-			invalid();
+			invalid_check(args);
 		} else if (args->roomID != -1 && !temp->inRoom) {
 			temp->inRoom = 1;
 			temp->roomID = args->roomID;
@@ -95,14 +95,14 @@ int check_logic(logappend_args * args) {
 			temp->inBuilding = 0;
 			temp->roomID = -1;
 		} else if (args->roomID == -1 && !temp->inBuilding) {
-			invalid();
+			invalid_check(args);
 		} else if (args->roomID != -1 && !temp->inBuilding) {
-			invalid();
+			invalid_check(args);
 		} else if (args->roomID != -1 && !temp->inRoom) {
-			invalid();
+			invalid_check(args);
 		} else if (args->roomID != -1 && temp->inRoom) {
 			if (args->roomID != temp->roomID) {
-				invalid();
+				invalid_check(args);
 			}
 			temp->inRoom = 0;
 			temp->roomID = 0;
@@ -163,6 +163,20 @@ int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
 
 void invalid() {
 	printf("invalid\n");
+	if (isBatch) {
+		exit(0);
+	} else {
+		exit(-1);
+	}
+}
+void invalid_check(logappend_args * args) {
+	printf("invalid\n");
+	unsigned int salt[] = { 12345, 54321 };
+	FILE * decrypted_file = fopen(args->logName, "r");
+	FILE * encrypted = fopen("tempblahman", "w+");
+	do_crypt(decrypted_file, encrypted, 1, args->token, strlen(args->token),
+			(unsigned char *) salt);
+	rename("tempblahman", args->logName);
 	if (isBatch) {
 		exit(0);
 	} else {

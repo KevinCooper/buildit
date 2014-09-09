@@ -42,7 +42,7 @@ int main(int argc, char * argv[]) {
 	size_t bytes = 0;
 	ssize_t read = 0;
 	char * line = NULL;
-	char interString[256];
+	char interString[MAX*4];
 
 	//get Logreader arguements
 	logread_args args = opt_parser(argc, argv, 1);
@@ -73,7 +73,7 @@ int main(int argc, char * argv[]) {
 		char ** tempv = argv_split(interString, &tempc);
 		logappend_args temp = opt_parser_log(tempc, tempv);
 		buildDataStructs(&temp);
-		bzero(interString, 256);
+		bzero(interString, MAX*4);
 		argv_free(tempv);
 		// FINISH LOGICZ
 	}

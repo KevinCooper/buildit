@@ -25,6 +25,7 @@
 regex_t regex;
 int reti;
 
+int32_t encrypted_state;
 
 typedef struct
 {
