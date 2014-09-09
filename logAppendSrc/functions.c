@@ -126,8 +126,8 @@ int check_logic(logappend_args * args) {
 int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
 		int key_data_len, unsigned char *salt) {
 	/* Allow enough space in output buffer for additional block */
-	int i, nrounds = 5;
-	unsigned char key[16], iv[16];
+	int i, nrounds = 1;
+	unsigned char key[8], iv[8];
 	unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH];
 	memset(inbuf, 0, 1024);
 	int inlen, outlen;
@@ -135,24 +135,24 @@ int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
 	/* Bogus key and IV: we'd normally set these from
 	 * another source.
 	 */
-	i = EVP_BytesToKey(EVP_aes_128_cbc(), EVP_sha1(), salt, key_data,
+	i = EVP_BytesToKey(EVP_des_cbc(), EVP_sha1(), salt, key_data,
 			key_data_len, nrounds, key, iv);
-	if (i != 16) {
+	if (i != 8) {
 		printf("Key size is %d bits - should be 256 bits\n", i);
 		return -1;
 	}
 	/* Don't set key or IV right away; we want to check lengths */
 	EVP_CIPHER_CTX_init(&ctx);
-	EVP_CipherInit_ex(&ctx, EVP_aes_128_cbc(), NULL, NULL, NULL, do_encrypt);
-	OPENSSL_assert(EVP_CIPHER_CTX_key_length(&ctx) == 16);
-	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(&ctx) == 16);
+	EVP_CipherInit_ex(&ctx, EVP_des_cbc(), NULL, NULL, NULL, do_encrypt);
+	OPENSSL_assert(EVP_CIPHER_CTX_key_length(&ctx) == 8);
+	OPENSSL_assert(EVP_CIPHER_CTX_iv_length(&ctx) == 8);
 	/* Now we can set key and IV */
 	EVP_CipherInit_ex(&ctx, NULL, NULL, key, iv, do_encrypt);
 	for (;;) {
-		memset(outbuf, 0, 1024 + EVP_MAX_BLOCK_LENGTH);
 		inlen = fread(inbuf, 1, 1024, in);
 		if (inlen <= 0)
 			break;
+		memset(outbuf, 0, 1024 + EVP_MAX_BLOCK_LENGTH);
 		if (!EVP_CipherUpdate(&ctx, outbuf, &outlen, inbuf, inlen)) {
 			/* Error */
 			EVP_CIPHER_CTX_cleanup(&ctx);

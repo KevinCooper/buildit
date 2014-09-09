@@ -27,7 +27,7 @@ def makePerson():
   isGuest = False
   if random.randrange(0, 9) > 3:
     isGuest = True
-  name = ''.join(random.choice(string.ascii_uppercase) for _ in range(12))
+  name = ''.join(random.choice(string.ascii_uppercase) for _ in range(280))
   name = random.choice(names)
   names.remove(name)
   return Person(name, isGuest)
@@ -295,7 +295,7 @@ def doMain(steps, toolpath, out, batch, test, html):
   curavg = 0.0
   curtotal = 0.0
   people = []
-  secret = ''.join(random.choice(string.ascii_uppercase) for _ in range(8))
+  secret = ''.join(random.choice(string.ascii_uppercase) for _ in range(300))
   logfile = ''.join(random.choice(string.ascii_uppercase) for _ in range(8))
   cmds = []
   history = {}
