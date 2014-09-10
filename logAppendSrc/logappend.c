@@ -33,6 +33,8 @@ unsigned char newMD5String[MD5_DIGEST_LENGTH + 1];
 uint32_t oldHashExists;
 uint32_t firstRun;
 
+char * password;
+
 HT* allMahHashes_guests = NULL;
 HT* allMahHashes_employees = NULL;
 
@@ -40,6 +42,7 @@ int main(int argc, char * argv[]) {
 	if (argc < 3)
 		invalid();
 	oldTime = -1;
+	password = NULL;
 	firstRun = 1;
 	logappend_args args = opt_parser(argc, argv, 1);
 	allMahHashes_employees = ht_create(65536);
@@ -129,8 +132,13 @@ void batch(logappend_args args) {
 		}
 		if (firstRun) {
 			cryptWrapper(&temp, DECRYPT);
+			password = temp.token;
 			inter(temp);
+		} else if (strcmp(password, temp.token)) {
+			fprintf(stderr, "security error\n");
+			continue;
 		}
+
 		if (check_logic(&temp) == -1) {
 			firstRun = 0;
 			fprintf(stderr, "invalid\n");
