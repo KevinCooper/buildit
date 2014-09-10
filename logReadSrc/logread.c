@@ -62,7 +62,7 @@ int main(int argc, char * argv[]) {
 
 	file = fopen(args.logName, "r");
 	//Line by line apply the options
-	while ((read = getline(&line, &bytes, file)) != -1 && fileSize > 16) {
+	while ((read = getline(&line, &bytes, file)) != -1 && fileSize > 10) {
 
 		int len = strlen(line);
 		fileSize = fileSize - len;
@@ -173,7 +173,7 @@ void doBadThings(logread_args* args) {
 			Node* temp = peopleHead;
 			while (temp) {
 				person* tempP = (person *) (temp->data);
-				if (tempP->roomID == currRoom) {
+				if (tempP->roomID == currRoom && tempP->inBuilding) {
 					if (isFirst)
 						printf("%d: ", currRoom);
 					if (!isFirst)
@@ -352,7 +352,6 @@ void doBadThings(logread_args* args) {
 			if (!args->inHTML) {
 				printf("%d", *tempNum);
 			} else {
-
 				print_I_element(tempNum);
 			}
 

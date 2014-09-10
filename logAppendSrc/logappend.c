@@ -112,7 +112,7 @@ void batch(logappend_args args) {
 		invalid_check(&args);
 	batchFile = fopen(args.batchFile, "r+");
 
-	while ((read = getline(&line, &bytes, batchFile)) != -1 && fileSize > 16) {
+	while ((read = getline(&line, &bytes, batchFile)) != -1 && fileSize > 10) {
 
 		int len = strlen(line);
 		fileSize = fileSize - len;
@@ -121,14 +121,21 @@ void batch(logappend_args args) {
 		int tempc;
 		char ** tempv = argv_split(interString, &tempc);
 		temp = opt_parser(tempc, tempv, 1);
-		if (temp.batchFile)
+
+		if (temp.batchFile) {
+			firstRun = 0;
+			fprintf(stderr, "invalid\n");
 			continue;
+		}
 		if (firstRun) {
 			cryptWrapper(&temp, DECRYPT);
 			inter(temp);
 		}
-		if (check_logic(&temp) == -1)
+		if (check_logic(&temp) == -1) {
+			firstRun = 0;
+			fprintf(stderr, "invalid\n");
 			continue;
+		}
 		processLine(temp, fileSize < 10 ? 1 : 0);
 		firstRun = 0;
 		bzero(interString, MAX * 4);

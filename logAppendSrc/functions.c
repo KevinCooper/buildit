@@ -12,7 +12,7 @@ void tokenOpt(char * input) {
 void cryptWrapper(logappend_args * args, int32_t type) {
 	uint32_t salt[] = { 12345, 54321 };
 	int32_t fileSize = fsize(args->logName);
-	if (fileSize < 16)
+	if (fileSize < 16 && type == 0)
 		return;
 	FILE * encrypted_file = fopen(args->logName, "r");
 	FILE * decrypted = fopen("tempblahman", "w");
@@ -81,7 +81,7 @@ int check_logic(logappend_args * args) {
 		}
 	}
 	if (args->timestamp <= oldTime) {
-		invalid_check(args);
+		return -1;
 	}
 	oldTime = args->timestamp;
 
@@ -92,11 +92,11 @@ int check_logic(logappend_args * args) {
 		if (args->roomID == -1 && !temp->inBuilding) {
 			temp->inBuilding = 1;
 		} else if (args->roomID == -1 && temp->inBuilding) {
-			invalid_check(args);
+			return -1;
 		} else if (args->roomID != -1 && !temp->inBuilding) {
-			invalid_check(args);
+			return -1;
 		} else if (args->roomID != -1 && temp->inRoom) {
-			invalid_check(args);
+			return -1;
 		} else if (args->roomID != -1 && !temp->inRoom) {
 			temp->inRoom = 1;
 			temp->roomID = args->roomID;
@@ -107,14 +107,14 @@ int check_logic(logappend_args * args) {
 			temp->inBuilding = 0;
 			temp->roomID = -1;
 		} else if (args->roomID == -1 && !temp->inBuilding) {
-			invalid_check(args);
+			return -1;
 		} else if (args->roomID != -1 && !temp->inBuilding) {
-			invalid_check(args);
+			return -1;
 		} else if (args->roomID != -1 && !temp->inRoom) {
-			invalid_check(args);
+			return -1;
 		} else if (args->roomID != -1 && temp->inRoom) {
 			if (args->roomID != temp->roomID) {
-				invalid_check(args);
+				return -1;
 			}
 			temp->inRoom = 0;
 			temp->roomID = 0;
