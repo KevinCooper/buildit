@@ -86,6 +86,8 @@ int do_crypt(FILE *in, FILE *out, int do_encrypt, unsigned char *key_data,
 	if (!EVP_CipherFinal_ex(&ctx, outbuf, &outlen)) {
 		/* Error */
 		EVP_CIPHER_CTX_cleanup(&ctx);
+		fclose(in);
+		fclose(out);
 		invalid_token();
 	}
 	fwrite(outbuf, 1, outlen, out);
@@ -118,6 +120,9 @@ void invalid_0() {
 
 void invalid_token() {
 	fprintf(stderr, "security error\n");
+	int32_t fileSize = fsize("tempblahman");
+	if (fileSize > 15)
+		unlink("tempblahman");
 	exit(-1);
 }
 

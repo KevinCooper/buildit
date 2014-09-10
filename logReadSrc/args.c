@@ -34,8 +34,6 @@ logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 	int32_t len = 0;
 	optind = 0;  //This must occur to have getopt back in its correct state!
 
-//TODO: Check for invalid inputs (Token Flag with no opt, will give ":" )
-
 	while ((c = getopt(argc, argv, "K:BHSRTAIL:U:E:G:")) != -1) {
 		switch (c) {
 		case 'H':
@@ -130,6 +128,9 @@ logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 			+ args.totalTime + args.printSpecificRooms_I
 			+ args.listEmployeesWithTime + args.listEmployeesWithoutTime;
 	if (exclusive_options > 1 || exclusive_options < 1)
+		invalid();
+
+	if(args.listAllRooms_R == 1 && args.employeeName == NULL && args.guestName == NULL)
 		invalid();
 
 	//Regex will filter out any negative numbers.  Hurrah
