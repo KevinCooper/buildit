@@ -132,6 +132,13 @@ logread_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 	if (exclusive_options > 1 || exclusive_options < 1)
 		invalid();
 
+	//Regex will filter out any negative numbers.  Hurrah
+	if (args.listEmployeesWithTime && args.bounds->lower >= args.bounds->upper)
+		invalid();
+	if (args.listEmployeesWithoutTime
+			&& args.bounds->lower1 >= args.bounds->upper1)
+		invalid();
+
 	return args;
 }
 

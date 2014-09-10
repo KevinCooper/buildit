@@ -87,9 +87,10 @@ logappend_args opt_parser(int32_t argc, char **argv, int32_t checkInput) {
 
 	if (args.batchFile != NULL) {
 
-	} else if (args.timestamp
-			== -1|| args.token == NULL || args.logName == NULL) {
-
+	} else if (checkInput
+			&& (args.timestamp == -1 || args.token == NULL
+					|| args.logName == NULL)) {
+		invalid();
 	} else if ((args.eventArrival == -1 && args.eventDeparture == -1)
 			|| (args.eventArrival == 1 && args.eventDeparture == 1)) {
 		invalid();
@@ -118,10 +119,10 @@ void * toString(logappend_args* args) {
 		} else {
 			strcat(string, "-A ");
 		}
-		if (args->employeeName == NULL) {
+		if (args->guestName != NULL) {
 			strcat(string, "-G ");
 			strcat(string, args->guestName);
-		} else {
+		} else if (args->employeeName != NULL) {
 			strcat(string, "-E ");
 			strcat(string, args->employeeName);
 		}

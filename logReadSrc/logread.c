@@ -343,7 +343,6 @@ void doBadThings(logread_args* args) {
 		isFirst = 1;
 		if (args->inHTML) {
 			printHeader();
-			printf("<tr>\n<th>Rooms</th>\n</tr>\n");
 		}
 		while (roomList) {
 			if (!isFirst && !args->inHTML)
@@ -352,6 +351,8 @@ void doBadThings(logread_args* args) {
 			if (!args->inHTML) {
 				printf("%d", *tempNum);
 			} else {
+				if (isFirst)
+					printf("<tr>\n<th>Rooms</th>\n</tr>\n");
 				print_I_element(tempNum);
 			}
 
