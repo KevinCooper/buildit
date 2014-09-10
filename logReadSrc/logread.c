@@ -195,22 +195,25 @@ void doBadThings(logread_args* args) {
 		} else {
 			blahzz = ht_get(allMahHashes_guests, args->guestName);
 		}
-		Node* temp = blahzz->rooms == NULL ? NULL : blahzz->rooms;
+		Node* temp = blahzz == NULL ? NULL : blahzz->rooms;
 		if (temp)
 			reverse(&temp);
 		uint32_t isFirst = 1;
 		if (args->inHTML)
-			init_R();
+			printHeader();
 		while (temp) {
 			int32_t* num = (int32_t*) (temp->data);
 			if (args->inHTML) {
+				if (isFirst)
+					init_R();
 				print_R_element(num);
 			} else {
 				if (!isFirst)
 					printf(",");
-				isFirst = 0;
+
 				printf("%d", *num);
 			}
+			isFirst = 0;
 			temp = temp->next;
 		}
 		if (args->inHTML)

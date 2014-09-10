@@ -17,7 +17,6 @@ void printGallery(person * tempE, person * tempG){
 }
 
 void init_R(){
-	printHeader();
 	printf("<tr>\n<th>Rooms</th>\n</tr>\n");
 }
 void print_R_element(int32_t * element){
