@@ -1,5 +1,6 @@
 # Build It Break It Submission #
 Kevin Cooper  - Builder
+
 William Parks - Fuzzer
 ## Introduction ##
 The purpose of this program is to meet the specifications presented in the following two documents.
